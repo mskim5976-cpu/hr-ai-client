@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 
 function App() {
   const [employees, setEmployees] = useState([]);
@@ -17,11 +17,11 @@ function App() {
 
   const API = process.env.REACT_APP_API_URL || "http://localhost:4000";
 
-  const fetchEmployees = async () => {
+  const fetchEmployees = useCallback(async () => {
     const res = await fetch(`${API}/api/employees`);
     const data = await res.json();
     setEmployees(data);
-  };
+  }, [API]);
 
   const generateComment = async (id) => {
     setLoading(true);
@@ -60,7 +60,7 @@ function App() {
 
   useEffect(() => {
     fetchEmployees();
-  }, []);
+  }, [fetchEmployees]);
 
   return (
     <div style={{ padding: 20, fontFamily: "sans-serif" }}>
