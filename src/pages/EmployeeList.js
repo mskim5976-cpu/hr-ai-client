@@ -11,6 +11,8 @@ const EmployeeList = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [skills, setSkills] = useState([]);
+  const [selectedSkills, setSelectedSkills] = useState([]);
 
   const fetchEmployees = useCallback(async () => {
     setLoading(true);
@@ -29,9 +31,20 @@ const EmployeeList = () => {
     }
   }, [statusFilter, searchTerm]);
 
+  const fetchSkills = useCallback(async () => {
+    try {
+      const res = await fetch(`${API}/api/skills`);
+      const data = await res.json();
+      setSkills(data);
+    } catch (error) {
+      console.error('Failed to fetch skills:', error);
+    }
+  }, []);
+
   useEffect(() => {
     fetchEmployees();
-  }, [fetchEmployees]);
+    fetchSkills();
+  }, [fetchEmployees, fetchSkills]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -43,6 +56,18 @@ const EmployeeList = () => {
       const res = await fetch(`${API}/api/employees/${id}`);
       const data = await res.json();
       setSelectedEmployee(data);
+
+      // 기존 스킬 파싱하여 selectedSkills 설정
+      if (data.skills) {
+        const skillNames = data.skills.split(',').map(s => s.trim());
+        const empSkills = skills
+          .filter(s => skillNames.includes(s.name))
+          .map(s => ({ id: s.id, level: '중급' }));
+        setSelectedSkills(empSkills);
+      } else {
+        setSelectedSkills([]);
+      }
+
       setIsEditMode(false);
       setIsModalOpen(true);
     } catch (error) {
@@ -66,7 +91,10 @@ const EmployeeList = () => {
       await fetch(`${API}/api/employees/${selectedEmployee.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(selectedEmployee),
+        body: JSON.stringify({
+          ...selectedEmployee,
+          skills: selectedSkills
+        }),
       });
       setIsModalOpen(false);
       fetchEmployees();
@@ -74,6 +102,30 @@ const EmployeeList = () => {
       console.error('Failed to update employee:', error);
     }
   };
+
+  const toggleSkill = (skillId) => {
+    setSelectedSkills(prev => {
+      if (prev.find(s => s.id === skillId)) {
+        return prev.filter(s => s.id !== skillId);
+      } else {
+        return [...prev, { id: skillId, level: '중급' }];
+      }
+    });
+  };
+
+  const updateSkillLevel = (skillId, level) => {
+    setSelectedSkills(prev =>
+      prev.map(s => s.id === skillId ? { ...s, level } : s)
+    );
+  };
+
+  // 스킬을 카테고리별로 그룹화
+  const skillsByCategory = skills.reduce((acc, skill) => {
+    const category = skill.category || '기타';
+    if (!acc[category]) acc[category] = [];
+    acc[category].push(skill);
+    return acc;
+  }, {});
 
   const getStatusBadge = (status) => {
     const badges = {
@@ -266,13 +318,21 @@ const EmployeeList = () => {
                 </div>
                 <div className="form-group">
                   <label className="form-label">지원파트</label>
-                  <input
-                    type="text"
+                  <select
                     className="form-control"
                     value={selectedEmployee.applied_part || ''}
                     onChange={(e) => setSelectedEmployee({ ...selectedEmployee, applied_part: e.target.value })}
                     disabled={!isEditMode}
-                  />
+                  >
+                    <option value="">선택하세요</option>
+                    <option value="Backend">Backend</option>
+                    <option value="Frontend">Frontend</option>
+                    <option value="Fullstack">Fullstack</option>
+                    <option value="DevOps">DevOps</option>
+                    <option value="DBA">DBA</option>
+                    <option value="QA">QA</option>
+                    <option value="PM">PM</option>
+                  </select>
                 </div>
               </div>
 
@@ -290,13 +350,21 @@ const EmployeeList = () => {
               <div className="form-row">
                 <div className="form-group">
                   <label className="form-label">직급</label>
-                  <input
-                    type="text"
+                  <select
                     className="form-control"
                     value={selectedEmployee.position || ''}
                     onChange={(e) => setSelectedEmployee({ ...selectedEmployee, position: e.target.value })}
                     disabled={!isEditMode}
-                  />
+                  >
+                    <option value="">선택하세요</option>
+                    <option value="인턴">인턴</option>
+                    <option value="사원">사원</option>
+                    <option value="주임">주임</option>
+                    <option value="대리">대리</option>
+                    <option value="과장">과장</option>
+                    <option value="차장">차장</option>
+                    <option value="부장">부장</option>
+                  </select>
                 </div>
                 <div className="form-group">
                   <label className="form-label">상태</label>
@@ -314,16 +382,63 @@ const EmployeeList = () => {
                 </div>
               </div>
 
-              {selectedEmployee.skills && (
-                <div className="form-group">
-                  <label className="form-label">기술역량</label>
-                  <div className="skill-tags">
-                    {selectedEmployee.skills.split(',').map((skill, idx) => (
-                      <span key={idx} className="skill-tag">{skill}</span>
+              <div className="form-group">
+                <label className="form-label">기술역량</label>
+                {isEditMode ? (
+                  <div>
+                    {Object.entries(skillsByCategory).map(([category, categorySkills]) => (
+                      <div key={category} style={{ marginBottom: '12px' }}>
+                        <small style={{ color: '#666', fontWeight: 'bold' }}>{category}</small>
+                        <div className="checkbox-group" style={{ marginTop: '6px' }}>
+                          {categorySkills.map((skill) => {
+                            const isSelected = selectedSkills.find(s => s.id === skill.id);
+                            return (
+                              <div
+                                key={skill.id}
+                                className={`checkbox-item ${isSelected ? 'selected' : ''}`}
+                                onClick={() => toggleSkill(skill.id)}
+                              >
+                                {skill.name}
+                                {isSelected && (
+                                  <select
+                                    value={isSelected.level}
+                                    onClick={(e) => e.stopPropagation()}
+                                    onChange={(e) => updateSkillLevel(skill.id, e.target.value)}
+                                    style={{
+                                      marginLeft: '8px',
+                                      padding: '2px 6px',
+                                      fontSize: '12px',
+                                      border: '1px solid rgba(255,255,255,0.3)',
+                                      background: 'white',
+                                      color: '#333',
+                                      borderRadius: '4px',
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    <option value="초급">초급</option>
+                                    <option value="중급">중급</option>
+                                    <option value="고급">고급</option>
+                                  </select>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
                     ))}
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div className="skill-tags">
+                    {selectedEmployee.skills ? (
+                      selectedEmployee.skills.split(',').map((skill, idx) => (
+                        <span key={idx} className="skill-tag">{skill.trim()}</span>
+                      ))
+                    ) : (
+                      <span style={{ color: '#999' }}>등록된 기술역량이 없습니다</span>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="modal-footer">

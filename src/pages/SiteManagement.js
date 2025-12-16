@@ -6,6 +6,7 @@ const API = process.env.REACT_APP_API_URL || 'http://localhost:4000';
 const SiteManagement = () => {
   const [sites, setSites] = useState([]);
   const [assignments, setAssignments] = useState([]);
+  const [assignmentHistory, setAssignmentHistory] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,14 +35,16 @@ const SiteManagement = () => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [sitesRes, assignmentsRes, employeesRes] = await Promise.all([
+      const [sitesRes, assignmentsRes, historyRes, employeesRes] = await Promise.all([
         fetch(`${API}/api/sites`),
         fetch(`${API}/api/assignments?status=진행중`),
+        fetch(`${API}/api/assignments?status=종료`),
         fetch(`${API}/api/employees?status=대기`),
       ]);
 
       setSites(await sitesRes.json());
       setAssignments(await assignmentsRes.json());
+      setAssignmentHistory(await historyRes.json());
       setEmployees(await employeesRes.json());
     } catch (error) {
       console.error('Failed to fetch data:', error);
@@ -297,6 +300,54 @@ const SiteManagement = () => {
                 <tr>
                   <td colSpan="5" style={{ textAlign: 'center', color: '#999', padding: '40px' }}>
                     현재 파견중인 인력이 없습니다
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* 파견 기록 */}
+      <div className="card">
+        <div className="card-header">
+          <h2 className="card-title">파견 기록 ({assignmentHistory.length})</h2>
+        </div>
+
+        <div className="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>인력</th>
+                <th>파견 사이트</th>
+                <th>파견 기간</th>
+                <th>월 단가</th>
+                <th>상태</th>
+              </tr>
+            </thead>
+            <tbody>
+              {assignmentHistory.map((assign) => (
+                <tr key={assign.id} style={{ opacity: 0.7 }}>
+                  <td>
+                    <strong>{assign.employee_name}</strong>
+                    <br />
+                    <small style={{ color: '#999' }}>{assign.applied_part} / {assign.position}</small>
+                  </td>
+                  <td>{assign.site_name}</td>
+                  <td>
+                    {assign.start_date?.split('T')[0]} ~<br />
+                    {assign.end_date?.split('T')[0] || '-'}
+                  </td>
+                  <td>{formatCurrency(assign.monthly_rate)}</td>
+                  <td>
+                    <span className="badge badge-secondary">종료</span>
+                  </td>
+                </tr>
+              ))}
+              {assignmentHistory.length === 0 && (
+                <tr>
+                  <td colSpan="5" style={{ textAlign: 'center', color: '#999', padding: '40px' }}>
+                    파견 기록이 없습니다
                   </td>
                 </tr>
               )}

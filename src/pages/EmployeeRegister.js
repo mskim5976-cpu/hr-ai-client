@@ -279,12 +279,13 @@ const EmployeeRegister = () => {
                           onChange={(e) => updateSkillLevel(skill.id, e.target.value)}
                           style={{
                             marginLeft: '8px',
-                            padding: '2px 4px',
+                            padding: '2px 6px',
                             fontSize: '12px',
-                            border: 'none',
-                            background: 'rgba(255,255,255,0.2)',
-                            color: 'inherit',
-                            borderRadius: '4px'
+                            border: '1px solid rgba(255,255,255,0.3)',
+                            background: 'white',
+                            color: '#333',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
                           }}
                         >
                           <option value="초급">초급</option>

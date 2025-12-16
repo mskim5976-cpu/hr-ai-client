@@ -217,6 +217,49 @@ const Dashboard = () => {
           )}
         </div>
       </div>
+
+      {/* 파견 만료 예정 인력 */}
+      <div className="card">
+        <div className="card-header">
+          <h2 className="card-title">파견 만료 예정 인력 (30일 이내)</h2>
+        </div>
+        {stats?.expiringAssignments?.length > 0 ? (
+          <div className="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>인력</th>
+                  <th>파견 사이트</th>
+                  <th>만료일</th>
+                  <th>남은 기간</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats.expiringAssignments.map((assign) => (
+                  <tr key={assign.id}>
+                    <td>
+                      <strong>{assign.employee_name}</strong>
+                      <br />
+                      <small style={{ color: '#999' }}>{assign.applied_part || '-'}</small>
+                    </td>
+                    <td>{assign.site_name}</td>
+                    <td>{assign.end_date?.split('T')[0]}</td>
+                    <td>
+                      <span className={`badge ${assign.days_left <= 7 ? 'badge-danger' : 'badge-warning'}`}>
+                        {assign.days_left}일 남음
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p style={{ color: '#999', textAlign: 'center', padding: '40px' }}>
+            30일 이내 파견 만료 예정 인력이 없습니다
+          </p>
+        )}
+      </div>
     </div>
   );
 };
