@@ -19,6 +19,7 @@ const ServerStatus = () => {
     memory: '',
     disk: '',
     status: '운영중',
+    ports: '',
   });
 
   const fetchServers = useCallback(async () => {
@@ -46,7 +47,7 @@ const ServerStatus = () => {
 
       setServers(prev =>
         prev.map(server =>
-          server.id === id ? { ...server, ping: data.ping } : server
+          server.id === id ? { ...server, ping: data.ping, portStatus: data.portStatus } : server
         )
       );
     } catch (error) {
@@ -72,6 +73,7 @@ const ServerStatus = () => {
       memory: '',
       disk: '',
       status: '운영중',
+      ports: '',
     });
     setEditingServer(null);
     setIsModalOpen(true);
@@ -87,6 +89,7 @@ const ServerStatus = () => {
       memory: server.memory || '',
       disk: server.disk || '',
       status: server.status || '운영중',
+      ports: server.ports || '',
     });
     setEditingServer(server);
     setIsModalOpen(true);
@@ -217,6 +220,7 @@ const ServerStatus = () => {
                 <th>용도</th>
                 <th>사양</th>
                 <th>상태</th>
+                <th>포트 상태</th>
                 <th>관리</th>
               </tr>
             </thead>
@@ -241,6 +245,32 @@ const ServerStatus = () => {
                     </div>
                   </td>
                   <td>
+                    {server.portStatus && server.portStatus.length > 0 ? (
+                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                        {server.portStatus.map((p, idx) => (
+                          <span
+                            key={idx}
+                            style={{
+                              padding: '2px 8px',
+                              borderRadius: '4px',
+                              fontSize: '12px',
+                              fontFamily: 'monospace',
+                              background: p.open ? 'rgba(40, 167, 69, 0.15)' : 'rgba(220, 53, 69, 0.15)',
+                              color: p.open ? '#28a745' : '#dc3545',
+                              border: `1px solid ${p.open ? '#28a745' : '#dc3545'}`
+                            }}
+                          >
+                            {p.port}: {p.open ? 'OPEN' : 'CLOSED'}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <span style={{ color: '#999', fontSize: '12px' }}>
+                        {server.ports ? '상태 확인 필요' : '-'}
+                      </span>
+                    )}
+                  </td>
+                  <td>
                     <div className="action-buttons">
                       <button
                         className="btn btn-sm btn-secondary"
@@ -262,7 +292,7 @@ const ServerStatus = () => {
               ))}
               {servers.length === 0 && (
                 <tr>
-                  <td colSpan="7" style={{ textAlign: 'center', color: '#999', padding: '40px' }}>
+                  <td colSpan="8" style={{ textAlign: 'center', color: '#999', padding: '40px' }}>
                     등록된 서버가 없습니다
                   </td>
                 </tr>
@@ -379,6 +409,20 @@ const ServerStatus = () => {
                     <option value="중지">중지</option>
                   </select>
                 </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">모니터링 포트</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={serverForm.ports}
+                  onChange={(e) => setServerForm({ ...serverForm, ports: e.target.value })}
+                  placeholder="예: 80,443,3306 (쉼표로 구분)"
+                />
+                <small style={{ color: '#666', marginTop: '4px', display: 'block' }}>
+                  체크할 포트를 쉼표로 구분하여 입력하세요
+                </small>
               </div>
             </div>
 
