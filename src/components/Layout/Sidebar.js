@@ -1,8 +1,8 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, UserPlus, Users, Building2, Server } from 'lucide-react';
+import { LayoutDashboard, UserPlus, Users, Building2, Server, LogOut, User } from 'lucide-react';
 
-const Sidebar = () => {
+const Sidebar = ({ user, onLogout }) => {
   const menuItems = [
     { path: '/', icon: LayoutDashboard, label: '대시보드' },
     { path: '/register', icon: UserPlus, label: '인사등록' },
@@ -31,6 +31,17 @@ const Sidebar = () => {
           </NavLink>
         ))}
       </nav>
+
+      <div className="sidebar-footer">
+        <div className="user-info">
+          <User size={18} />
+          <span>{user?.name || user?.username || '사용자'}</span>
+        </div>
+        <button className="logout-btn" onClick={onLogout}>
+          <LogOut size={18} />
+          <span>로그아웃</span>
+        </button>
+      </div>
     </aside>
   );
 };
