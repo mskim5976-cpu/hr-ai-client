@@ -452,17 +452,18 @@ const EmployeeList = () => {
                   </select>
                 </div>
                 <div className="form-group-modern">
-                  <label className="form-label">상태 <small style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>(재직/퇴사만 선택 가능)</small></label>
+                  <label className="form-label">상태 <small style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>(파견중 → 다른 상태 변경 시 파견 자동 종료)</small></label>
                   <select
                     className="form-control-modern"
                     value={selectedEmployee.status || ''}
                     onChange={(e) => setSelectedEmployee({ ...selectedEmployee, status: e.target.value })}
                     disabled={!isEditMode}
                   >
-                    {/* 현재 상태가 파견중/대기면 표시만 (선택 불가) */}
-                    {(selectedEmployee.status === '파견중' || selectedEmployee.status === '대기') && (
-                      <option value={selectedEmployee.status} disabled>{selectedEmployee.status} (파견관리에서 변경)</option>
+                    {/* 현재 상태가 파견중이면 표시만 (선택 불가) */}
+                    {selectedEmployee.status === '파견중' && (
+                      <option value="파견중" disabled>파견중 (아래에서 변경)</option>
                     )}
+                    <option value="대기">대기</option>
                     <option value="재직">재직</option>
                     <option value="퇴사">퇴사</option>
                   </select>

@@ -79,13 +79,15 @@ const SiteManagement = () => {
         fetch(`${API}/api/sites`),
         fetch(`${API}/api/assignments?status=진행중`),
         fetch(`${API}/api/assignments?status=종료`),
-        fetch(`${API}/api/employees?status=대기`),
+        fetch(`${API}/api/employees`),  // 전체 직원 조회 (대기, 재직만 필터)
       ]);
 
       setSites(await sitesRes.json());
       setAssignments(await assignmentsRes.json());
       setAssignmentHistory(await historyRes.json());
-      setEmployees(await employeesRes.json());
+      // 대기, 재직 상태만 필터 (퇴사, 파견중 제외)
+      const allEmployees = await employeesRes.json();
+      setEmployees(allEmployees.filter(e => e.status === '대기' || e.status === '재직'));
     } catch (error) {
       console.error('Failed to fetch data:', error);
     } finally {
@@ -627,12 +629,14 @@ const SiteManagement = () => {
                   <option value="">선택하세요</option>
                   {employees.map((emp) => (
                     <option key={emp.id} value={emp.id}>
-                      {emp.name} ({emp.applied_part || '미지정'} / {emp.position || '미지정'})
+                      {emp.name} ({emp.applied_part || '미지정'} / {emp.position || '미지정'}) [{emp.status}]
                     </option>
                   ))}
                 </select>
-                {employees.length === 0 && (
-                  <small style={{ color: 'var(--danger)', marginTop: 4, display: 'block' }}>대기 상태의 인력이 없습니다</small>
+                {employees.length === 0 ? (
+                  <small style={{ color: 'var(--danger)', marginTop: 4, display: 'block' }}>배정 가능한 인력이 없습니다</small>
+                ) : (
+                  <small style={{ color: 'var(--text-secondary)', marginTop: 4, display: 'block' }}>※ 대기/재직 상태만 선택 가능 (퇴사/파견중 제외)</small>
                 )}
               </div>
 
