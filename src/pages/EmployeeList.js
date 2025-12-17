@@ -1,7 +1,31 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Search, Eye, Edit2, Trash2, X } from 'lucide-react';
+import { Search, Eye, Edit2, Trash2, X, Users, Filter } from 'lucide-react';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:4000';
+
+// Skeleton 컴포넌트
+const SkeletonRow = () => (
+  <tr>
+    <td><div className="skeleton" style={{ width: '60%', height: 16, borderRadius: 4 }} /></td>
+    <td><div className="skeleton" style={{ width: '80%', height: 16, borderRadius: 4 }} /></td>
+    <td><div className="skeleton" style={{ width: '70%', height: 16, borderRadius: 4 }} /></td>
+    <td><div className="skeleton" style={{ width: '50%', height: 16, borderRadius: 4 }} /></td>
+    <td><div className="skeleton" style={{ width: '40%', height: 16, borderRadius: 4 }} /></td>
+    <td><div className="skeleton" style={{ width: 60, height: 24, borderRadius: 12 }} /></td>
+    <td><div className="skeleton" style={{ width: 60, height: 28, borderRadius: 6 }} /></td>
+  </tr>
+);
+
+// Empty State 컴포넌트
+const EmptyState = ({ icon: Icon, title, description }) => (
+  <div className="empty-state">
+    <div className="empty-state-icon">
+      <Icon size={32} />
+    </div>
+    <h3 className="empty-state-title">{title}</h3>
+    <p className="empty-state-description">{description}</p>
+  </div>
+);
 
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
@@ -137,75 +161,69 @@ const EmployeeList = () => {
     return badges[status] || 'badge-primary';
   };
 
+  const filterButtons = [
+    { label: '전체', value: '' },
+    { label: '파견중', value: '파견중' },
+    { label: '대기', value: '대기' },
+    { label: '재직', value: '재직' },
+    { label: '퇴사', value: '퇴사' },
+  ];
+
   return (
     <div>
       <div className="page-header">
         <h1 className="page-title">인사현황</h1>
+        <p style={{ color: 'var(--text-secondary)', marginTop: 4 }}>IT 인력 현황을 조회하고 관리하세요</p>
       </div>
 
-      {/* 검색 및 필터 */}
-      <div className="card">
-        <form onSubmit={handleSearch} className="search-bar">
-          <div className="search-input" style={{ position: 'relative' }}>
-            <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#999' }} />
+      {/* 검색 및 필터 - Bento Card 스타일 */}
+      <div className="bento-card card-enter stagger-1" style={{ marginBottom: 20 }}>
+        <form onSubmit={handleSearch} className="search-bar-modern">
+          <div className="search-input-modern">
+            <Search size={18} className="search-icon" />
             <input
               type="text"
-              className="form-control"
+              className="form-control-modern"
               placeholder="이름, 이메일, 연락처로 검색..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ paddingLeft: '40px' }}
             />
           </div>
-          <button type="submit" className="btn btn-primary">검색</button>
+          <button type="submit" className="btn btn-primary btn-hover-lift">검색</button>
         </form>
 
-        <div className="filter-group">
-          <button
-            className={`filter-btn ${statusFilter === '' ? 'active' : ''}`}
-            onClick={() => setStatusFilter('')}
-          >
-            전체
-          </button>
-          <button
-            className={`filter-btn ${statusFilter === '파견중' ? 'active' : ''}`}
-            onClick={() => setStatusFilter('파견중')}
-          >
-            파견중
-          </button>
-          <button
-            className={`filter-btn ${statusFilter === '대기' ? 'active' : ''}`}
-            onClick={() => setStatusFilter('대기')}
-          >
-            대기
-          </button>
-          <button
-            className={`filter-btn ${statusFilter === '재직' ? 'active' : ''}`}
-            onClick={() => setStatusFilter('재직')}
-          >
-            재직
-          </button>
-          <button
-            className={`filter-btn ${statusFilter === '퇴사' ? 'active' : ''}`}
-            onClick={() => setStatusFilter('퇴사')}
-          >
-            퇴사
-          </button>
+        <div className="filter-group-modern">
+          <div className="filter-label">
+            <Filter size={14} />
+            <span>상태 필터</span>
+          </div>
+          <div className="filter-buttons">
+            {filterButtons.map((btn) => (
+              <button
+                key={btn.value}
+                className={`filter-btn-modern ${statusFilter === btn.value ? 'active' : ''}`}
+                onClick={() => setStatusFilter(btn.value)}
+              >
+                {btn.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* 직원 목록 */}
-      <div className="card">
-        <div className="card-header">
-          <h2 className="card-title">인력 목록</h2>
-          <span style={{ color: '#666' }}>총 {employees.length}명</span>
+      {/* 직원 목록 - Bento Card 스타일 */}
+      <div className="bento-card card-enter stagger-2">
+        <div className="bento-card-header">
+          <div className="bento-card-icon">
+            <Users size={20} />
+          </div>
+          <h2 className="bento-card-title">인력 목록</h2>
+          <span className="badge-modern badge-primary" style={{ marginLeft: 'auto' }}>
+            총 {employees.length}명
+          </span>
         </div>
 
         {loading ? (
-          <div className="loading">
-            <div className="spinner"></div>
-          </div>
-        ) : (
           <div className="table-container">
             <table>
               <thead>
@@ -220,47 +238,73 @@ const EmployeeList = () => {
                 </tr>
               </thead>
               <tbody>
-                {employees.map((emp) => (
-                  <tr key={emp.id}>
+                {[...Array(5)].map((_, i) => <SkeletonRow key={i} />)}
+              </tbody>
+            </table>
+          </div>
+        ) : employees.length > 0 ? (
+          <div className="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>이름</th>
+                  <th>연락처</th>
+                  <th>이메일</th>
+                  <th>지원파트</th>
+                  <th>직급</th>
+                  <th>상태</th>
+                  <th>관리</th>
+                </tr>
+              </thead>
+              <tbody>
+                {employees.map((emp, index) => (
+                  <tr key={emp.id} className="table-row-hover" style={{ animationDelay: `${index * 0.03}s` }}>
                     <td><strong>{emp.name}</strong></td>
                     <td>{emp.phone || '-'}</td>
                     <td>{emp.email || '-'}</td>
                     <td>{emp.applied_part || '-'}</td>
                     <td>{emp.position || '-'}</td>
                     <td>
-                      <span className={`badge ${getStatusBadge(emp.status)}`}>
+                      <span className={`badge-modern badge-with-dot ${getStatusBadge(emp.status)}`}>
                         {emp.status}
                       </span>
                     </td>
                     <td>
                       <div className="action-buttons">
-                        <button className="btn btn-sm btn-secondary" onClick={() => viewEmployee(emp.id)}>
+                        <button
+                          className="btn btn-sm btn-secondary btn-hover-lift"
+                          onClick={() => viewEmployee(emp.id)}
+                          title="상세보기"
+                        >
                           <Eye size={14} />
                         </button>
-                        <button className="btn btn-sm btn-danger" onClick={() => deleteEmployee(emp.id)}>
+                        <button
+                          className="btn btn-sm btn-danger btn-hover-lift"
+                          onClick={() => deleteEmployee(emp.id)}
+                          title="삭제"
+                        >
                           <Trash2 size={14} />
                         </button>
                       </div>
                     </td>
                   </tr>
                 ))}
-                {employees.length === 0 && (
-                  <tr>
-                    <td colSpan="7" style={{ textAlign: 'center', color: '#999', padding: '40px' }}>
-                      등록된 인력이 없습니다
-                    </td>
-                  </tr>
-                )}
               </tbody>
             </table>
           </div>
+        ) : (
+          <EmptyState
+            icon={Users}
+            title="등록된 인력이 없습니다"
+            description="새로운 인력을 등록하거나 검색 조건을 변경해보세요"
+          />
         )}
       </div>
 
-      {/* 상세/수정 모달 */}
+      {/* 상세/수정 모달 - Modern 스타일 */}
       {isModalOpen && selectedEmployee && (
         <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-modern" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3 className="modal-title">
                 {isEditMode ? '인력 정보 수정' : '인력 상세 정보'}
@@ -272,21 +316,21 @@ const EmployeeList = () => {
 
             <div className="modal-body">
               <div className="form-row">
-                <div className="form-group">
+                <div className="form-group-modern">
                   <label className="form-label">이름</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control-modern"
                     value={selectedEmployee.name || ''}
                     onChange={(e) => setSelectedEmployee({ ...selectedEmployee, name: e.target.value })}
                     disabled={!isEditMode}
                   />
                 </div>
-                <div className="form-group">
+                <div className="form-group-modern">
                   <label className="form-label">연락처</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control-modern"
                     value={selectedEmployee.phone || ''}
                     onChange={(e) => setSelectedEmployee({ ...selectedEmployee, phone: e.target.value })}
                     disabled={!isEditMode}
@@ -294,11 +338,11 @@ const EmployeeList = () => {
                 </div>
               </div>
 
-              <div className="form-group">
+              <div className="form-group-modern">
                 <label className="form-label">이메일</label>
                 <input
                   type="email"
-                  className="form-control"
+                  className="form-control-modern"
                   value={selectedEmployee.email || ''}
                   onChange={(e) => setSelectedEmployee({ ...selectedEmployee, email: e.target.value })}
                   disabled={!isEditMode}
@@ -306,20 +350,20 @@ const EmployeeList = () => {
               </div>
 
               <div className="form-row">
-                <div className="form-group">
+                <div className="form-group-modern">
                   <label className="form-label">나이</label>
                   <input
                     type="number"
-                    className="form-control"
+                    className="form-control-modern"
                     value={selectedEmployee.age || ''}
                     onChange={(e) => setSelectedEmployee({ ...selectedEmployee, age: e.target.value })}
                     disabled={!isEditMode}
                   />
                 </div>
-                <div className="form-group">
+                <div className="form-group-modern">
                   <label className="form-label">지원파트</label>
                   <select
-                    className="form-control"
+                    className="form-control-modern"
                     value={selectedEmployee.applied_part || ''}
                     onChange={(e) => setSelectedEmployee({ ...selectedEmployee, applied_part: e.target.value })}
                     disabled={!isEditMode}
@@ -336,11 +380,11 @@ const EmployeeList = () => {
                 </div>
               </div>
 
-              <div className="form-group">
+              <div className="form-group-modern">
                 <label className="form-label">주소</label>
                 <input
                   type="text"
-                  className="form-control"
+                  className="form-control-modern"
                   value={selectedEmployee.address || ''}
                   onChange={(e) => setSelectedEmployee({ ...selectedEmployee, address: e.target.value })}
                   disabled={!isEditMode}
@@ -348,10 +392,10 @@ const EmployeeList = () => {
               </div>
 
               <div className="form-row">
-                <div className="form-group">
+                <div className="form-group-modern">
                   <label className="form-label">직급</label>
                   <select
-                    className="form-control"
+                    className="form-control-modern"
                     value={selectedEmployee.position || ''}
                     onChange={(e) => setSelectedEmployee({ ...selectedEmployee, position: e.target.value })}
                     disabled={!isEditMode}
@@ -366,10 +410,10 @@ const EmployeeList = () => {
                     <option value="부장">부장</option>
                   </select>
                 </div>
-                <div className="form-group">
+                <div className="form-group-modern">
                   <label className="form-label">상태</label>
                   <select
-                    className="form-control"
+                    className="form-control-modern"
                     value={selectedEmployee.status || ''}
                     onChange={(e) => setSelectedEmployee({ ...selectedEmployee, status: e.target.value })}
                     disabled={!isEditMode}
@@ -382,20 +426,20 @@ const EmployeeList = () => {
                 </div>
               </div>
 
-              <div className="form-group">
+              <div className="form-group-modern">
                 <label className="form-label">기술역량</label>
                 {isEditMode ? (
                   <div>
                     {Object.entries(skillsByCategory).map(([category, categorySkills]) => (
-                      <div key={category} style={{ marginBottom: '12px' }}>
-                        <small style={{ color: '#666', fontWeight: 'bold' }}>{category}</small>
-                        <div className="checkbox-group" style={{ marginTop: '6px' }}>
+                      <div key={category} style={{ marginBottom: '16px' }}>
+                        <small style={{ color: 'var(--text-secondary)', fontWeight: 600, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{category}</small>
+                        <div className="checkbox-group-modern" style={{ marginTop: '8px' }}>
                           {categorySkills.map((skill) => {
                             const isSelected = selectedSkills.find(s => s.id === skill.id);
                             return (
                               <div
                                 key={skill.id}
-                                className={`checkbox-item ${isSelected ? 'selected' : ''}`}
+                                className={`checkbox-item-modern ${isSelected ? 'selected' : ''}`}
                                 onClick={() => toggleSkill(skill.id)}
                               >
                                 {skill.name}
@@ -404,16 +448,7 @@ const EmployeeList = () => {
                                     value={isSelected.level}
                                     onClick={(e) => e.stopPropagation()}
                                     onChange={(e) => updateSkillLevel(skill.id, e.target.value)}
-                                    style={{
-                                      marginLeft: '8px',
-                                      padding: '2px 6px',
-                                      fontSize: '12px',
-                                      border: '1px solid rgba(255,255,255,0.3)',
-                                      background: 'white',
-                                      color: '#333',
-                                      borderRadius: '4px',
-                                      cursor: 'pointer'
-                                    }}
+                                    className="skill-level-select"
                                   >
                                     <option value="초급">초급</option>
                                     <option value="중급">중급</option>
@@ -428,13 +463,13 @@ const EmployeeList = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="skill-tags">
+                  <div className="skill-tags-modern">
                     {selectedEmployee.skills ? (
                       selectedEmployee.skills.split(',').map((skill, idx) => (
-                        <span key={idx} className="skill-tag">{skill.trim()}</span>
+                        <span key={idx} className="skill-tag-modern">{skill.trim()}</span>
                       ))
                     ) : (
-                      <span style={{ color: '#999' }}>등록된 기술역량이 없습니다</span>
+                      <span style={{ color: 'var(--text-secondary)' }}>등록된 기술역량이 없습니다</span>
                     )}
                   </div>
                 )}
@@ -444,15 +479,15 @@ const EmployeeList = () => {
             <div className="modal-footer">
               {isEditMode ? (
                 <>
-                  <button className="btn btn-secondary" onClick={() => setIsEditMode(false)}>
+                  <button className="btn btn-secondary btn-hover-lift" onClick={() => setIsEditMode(false)}>
                     취소
                   </button>
-                  <button className="btn btn-primary" onClick={updateEmployee}>
+                  <button className="btn btn-primary btn-hover-lift" onClick={updateEmployee}>
                     저장
                   </button>
                 </>
               ) : (
-                <button className="btn btn-primary" onClick={() => setIsEditMode(true)}>
+                <button className="btn btn-primary btn-hover-lift" onClick={() => setIsEditMode(true)}>
                   <Edit2 size={16} /> 수정
                 </button>
               )}

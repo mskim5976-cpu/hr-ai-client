@@ -1,7 +1,27 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Building2, Plus, Edit2, Trash2, X, Users, Calendar } from 'lucide-react';
+import { Building2, Plus, Edit2, Trash2, X, Users, Calendar, Clock, MapPin } from 'lucide-react';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:4000';
+
+// Skeleton 컴포넌트
+const SkeletonRow = ({ cols = 7 }) => (
+  <tr>
+    {[...Array(cols)].map((_, i) => (
+      <td key={i}><div className="skeleton" style={{ width: `${60 + Math.random() * 30}%`, height: 16, borderRadius: 4 }} /></td>
+    ))}
+  </tr>
+);
+
+// Empty State 컴포넌트
+const EmptyState = ({ icon: Icon, title, description }) => (
+  <div className="empty-state">
+    <div className="empty-state-icon">
+      <Icon size={32} />
+    </div>
+    <h3 className="empty-state-title">{title}</h3>
+    <p className="empty-state-description">{description}</p>
+  </div>
+);
 
 const SiteManagement = () => {
   const [sites, setSites] = useState([]);
@@ -169,197 +189,258 @@ const SiteManagement = () => {
     return new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(amount);
   };
 
+  // Skeleton 로딩 UI
   if (loading) {
     return (
-      <div className="loading">
-        <div className="spinner"></div>
+      <div>
+        <div className="page-header">
+          <h1 className="page-title">파견관리</h1>
+        </div>
+        <div className="bento-card">
+          <div className="bento-card-header">
+            <div className="skeleton" style={{ width: 150, height: 24, borderRadius: 6 }} />
+          </div>
+          <div className="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>고객사</th>
+                  <th>담당자</th>
+                  <th>계약기간</th>
+                  <th>계약형태</th>
+                  <th>파견인원</th>
+                  <th>상태</th>
+                  <th>관리</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[...Array(3)].map((_, i) => <SkeletonRow key={i} />)}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div>
-      <div className="page-header">
-        <h1 className="page-title">파견관리</h1>
-        <button className="btn btn-primary" onClick={openAddModal}>
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <h1 className="page-title">파견관리</h1>
+          <p style={{ color: 'var(--text-secondary)', marginTop: 4 }}>파견 사이트와 인력 배정을 관리하세요</p>
+        </div>
+        <button className="btn btn-primary btn-hover-lift" onClick={openAddModal}>
           <Plus size={18} /> 사이트 등록
         </button>
       </div>
 
       {/* 파견 사이트 목록 */}
-      <div className="card">
-        <div className="card-header">
-          <h2 className="card-title">파견 사이트 ({sites.length})</h2>
+      <div className="bento-card card-enter stagger-1" style={{ marginBottom: 20 }}>
+        <div className="bento-card-header">
+          <div className="bento-card-icon">
+            <Building2 size={20} />
+          </div>
+          <h2 className="bento-card-title">파견 사이트</h2>
+          <span className="badge-modern badge-primary" style={{ marginLeft: 'auto' }}>
+            {sites.length}개
+          </span>
         </div>
 
-        <div className="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>고객사</th>
-                <th>담당자</th>
-                <th>계약기간</th>
-                <th>계약형태</th>
-                <th>파견인원</th>
-                <th>상태</th>
-                <th>관리</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sites.map((site) => (
-                <tr key={site.id}>
-                  <td>
-                    <strong>{site.name}</strong>
-                    <br />
-                    <small style={{ color: '#999' }}>{site.address}</small>
-                  </td>
-                  <td>
-                    {site.contact_person || '-'}
-                    <br />
-                    <small style={{ color: '#999' }}>{site.contact_phone}</small>
-                  </td>
-                  <td>
-                    {site.contract_start?.split('T')[0]} ~<br />
-                    {site.contract_end?.split('T')[0]}
-                  </td>
-                  <td>{site.contract_type || '-'}</td>
-                  <td>
-                    <span className="badge badge-info">{site.employee_count || 0}명</span>
-                  </td>
-                  <td>
-                    <span className={`badge ${site.status === '진행중' ? 'badge-success' : 'badge-danger'}`}>
-                      {site.status}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="action-buttons">
-                      <button className="btn btn-sm btn-success" onClick={() => openAssignModal(site.id)} title="인원 배정">
-                        <Users size={14} />
-                      </button>
-                      <button className="btn btn-sm btn-secondary" onClick={() => openEditModal(site)}>
-                        <Edit2 size={14} />
-                      </button>
-                      <button className="btn btn-sm btn-danger" onClick={() => deleteSite(site.id)}>
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {sites.length === 0 && (
+        {sites.length > 0 ? (
+          <div className="table-container">
+            <table>
+              <thead>
                 <tr>
-                  <td colSpan="7" style={{ textAlign: 'center', color: '#999', padding: '40px' }}>
-                    등록된 사이트가 없습니다
-                  </td>
+                  <th>고객사</th>
+                  <th>담당자</th>
+                  <th>계약기간</th>
+                  <th>계약형태</th>
+                  <th>파견인원</th>
+                  <th>상태</th>
+                  <th>관리</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {sites.map((site, index) => (
+                  <tr key={site.id} className="table-row-hover" style={{ animationDelay: `${index * 0.03}s` }}>
+                    <td>
+                      <strong>{site.name}</strong>
+                      <br />
+                      <small style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
+                        <MapPin size={12} /> {site.address || '-'}
+                      </small>
+                    </td>
+                    <td>
+                      {site.contact_person || '-'}
+                      <br />
+                      <small style={{ color: 'var(--text-secondary)' }}>{site.contact_phone}</small>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <Clock size={14} style={{ color: 'var(--text-secondary)' }} />
+                        <span>
+                          {site.contract_start?.split('T')[0]} ~<br />
+                          {site.contract_end?.split('T')[0]}
+                        </span>
+                      </div>
+                    </td>
+                    <td>
+                      <span className="badge-modern badge-info">{site.contract_type || '-'}</span>
+                    </td>
+                    <td>
+                      <span className="badge-modern badge-with-dot badge-primary">{site.employee_count || 0}명</span>
+                    </td>
+                    <td>
+                      <span className={`badge-modern badge-with-dot ${site.status === '진행중' ? 'badge-success' : site.status === '종료' ? 'badge-danger' : 'badge-warning'}`}>
+                        {site.status}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="action-buttons">
+                        <button className="btn btn-sm btn-success btn-hover-lift" onClick={() => openAssignModal(site.id)} title="인원 배정">
+                          <Users size={14} />
+                        </button>
+                        <button className="btn btn-sm btn-secondary btn-hover-lift" onClick={() => openEditModal(site)} title="수정">
+                          <Edit2 size={14} />
+                        </button>
+                        <button className="btn btn-sm btn-danger btn-hover-lift" onClick={() => deleteSite(site.id)} title="삭제">
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <EmptyState
+            icon={Building2}
+            title="등록된 사이트가 없습니다"
+            description="상단의 '사이트 등록' 버튼을 클릭하여 새 사이트를 추가하세요"
+          />
+        )}
       </div>
 
       {/* 현재 파견 현황 */}
-      <div className="card">
-        <div className="card-header">
-          <h2 className="card-title">현재 파견 현황</h2>
+      <div className="bento-card card-enter stagger-2" style={{ marginBottom: 20 }}>
+        <div className="bento-card-header">
+          <div className="bento-card-icon success">
+            <Users size={20} />
+          </div>
+          <h2 className="bento-card-title">현재 파견 현황</h2>
+          <span className="badge-modern badge-success" style={{ marginLeft: 'auto' }}>
+            {assignments.length}명 파견중
+          </span>
         </div>
 
-        <div className="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>인력</th>
-                <th>파견 사이트</th>
-                <th>파견 기간</th>
-                <th>월 단가</th>
-                <th>관리</th>
-              </tr>
-            </thead>
-            <tbody>
-              {assignments.map((assign) => (
-                <tr key={assign.id}>
-                  <td>
-                    <strong>{assign.employee_name}</strong>
-                    <br />
-                    <small style={{ color: '#999' }}>{assign.applied_part} / {assign.position}</small>
-                  </td>
-                  <td>{assign.site_name}</td>
-                  <td>
-                    {assign.start_date?.split('T')[0]} ~<br />
-                    {assign.end_date?.split('T')[0] || '미정'}
-                  </td>
-                  <td>{formatCurrency(assign.monthly_rate)}</td>
-                  <td>
-                    <button className="btn btn-sm btn-danger" onClick={() => endAssignment(assign.id)}>
-                      파견 종료
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {assignments.length === 0 && (
+        {assignments.length > 0 ? (
+          <div className="table-container">
+            <table>
+              <thead>
                 <tr>
-                  <td colSpan="5" style={{ textAlign: 'center', color: '#999', padding: '40px' }}>
-                    현재 파견중인 인력이 없습니다
-                  </td>
+                  <th>인력</th>
+                  <th>파견 사이트</th>
+                  <th>파견 기간</th>
+                  <th>월 단가</th>
+                  <th>관리</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {assignments.map((assign, index) => (
+                  <tr key={assign.id} className="table-row-hover" style={{ animationDelay: `${index * 0.03}s` }}>
+                    <td>
+                      <strong>{assign.employee_name}</strong>
+                      <br />
+                      <small style={{ color: 'var(--text-secondary)' }}>{assign.applied_part} / {assign.position}</small>
+                    </td>
+                    <td>
+                      <span className="badge-modern badge-info">{assign.site_name}</span>
+                    </td>
+                    <td>
+                      {assign.start_date?.split('T')[0]} ~<br />
+                      {assign.end_date?.split('T')[0] || '미정'}
+                    </td>
+                    <td><strong>{formatCurrency(assign.monthly_rate)}</strong></td>
+                    <td>
+                      <button className="btn btn-sm btn-danger btn-hover-lift" onClick={() => endAssignment(assign.id)}>
+                        파견 종료
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <EmptyState
+            icon={Users}
+            title="파견중인 인력이 없습니다"
+            description="사이트에서 '인원 배정' 버튼을 클릭하여 인력을 배정하세요"
+          />
+        )}
       </div>
 
       {/* 파견 기록 */}
-      <div className="card">
-        <div className="card-header">
-          <h2 className="card-title">파견 기록 ({assignmentHistory.length})</h2>
+      <div className="bento-card card-enter stagger-3">
+        <div className="bento-card-header">
+          <div className="bento-card-icon" style={{ opacity: 0.6 }}>
+            <Calendar size={20} />
+          </div>
+          <h2 className="bento-card-title" style={{ opacity: 0.8 }}>파견 기록</h2>
+          <span className="badge-modern" style={{ marginLeft: 'auto', background: 'var(--gray-200)', color: 'var(--text-secondary)' }}>
+            {assignmentHistory.length}건
+          </span>
         </div>
 
-        <div className="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>인력</th>
-                <th>파견 사이트</th>
-                <th>파견 기간</th>
-                <th>월 단가</th>
-                <th>상태</th>
-              </tr>
-            </thead>
-            <tbody>
-              {assignmentHistory.map((assign) => (
-                <tr key={assign.id} style={{ opacity: 0.7 }}>
-                  <td>
-                    <strong>{assign.employee_name}</strong>
-                    <br />
-                    <small style={{ color: '#999' }}>{assign.applied_part} / {assign.position}</small>
-                  </td>
-                  <td>{assign.site_name}</td>
-                  <td>
-                    {assign.start_date?.split('T')[0]} ~<br />
-                    {assign.end_date?.split('T')[0] || '-'}
-                  </td>
-                  <td>{formatCurrency(assign.monthly_rate)}</td>
-                  <td>
-                    <span className="badge badge-secondary">종료</span>
-                  </td>
-                </tr>
-              ))}
-              {assignmentHistory.length === 0 && (
+        {assignmentHistory.length > 0 ? (
+          <div className="table-container" style={{ opacity: 0.8 }}>
+            <table>
+              <thead>
                 <tr>
-                  <td colSpan="5" style={{ textAlign: 'center', color: '#999', padding: '40px' }}>
-                    파견 기록이 없습니다
-                  </td>
+                  <th>인력</th>
+                  <th>파견 사이트</th>
+                  <th>파견 기간</th>
+                  <th>월 단가</th>
+                  <th>상태</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {assignmentHistory.map((assign) => (
+                  <tr key={assign.id} style={{ opacity: 0.7 }}>
+                    <td>
+                      <strong>{assign.employee_name}</strong>
+                      <br />
+                      <small style={{ color: 'var(--text-secondary)' }}>{assign.applied_part} / {assign.position}</small>
+                    </td>
+                    <td>{assign.site_name}</td>
+                    <td>
+                      {assign.start_date?.split('T')[0]} ~<br />
+                      {assign.end_date?.split('T')[0] || '-'}
+                    </td>
+                    <td>{formatCurrency(assign.monthly_rate)}</td>
+                    <td>
+                      <span className="badge-modern" style={{ background: 'var(--gray-200)', color: 'var(--text-secondary)' }}>종료</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <EmptyState
+            icon={Calendar}
+            title="파견 기록이 없습니다"
+            description="종료된 파견 기록이 여기에 표시됩니다"
+          />
+        )}
       </div>
 
       {/* 사이트 등록/수정 모달 */}
       {isModalOpen && (
         <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '700px' }}>
+          <div className="modal-modern" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '700px' }}>
             <div className="modal-header">
               <h3 className="modal-title">
                 <Building2 size={20} style={{ marginRight: '8px' }} />
@@ -372,19 +453,19 @@ const SiteManagement = () => {
 
             <div className="modal-body">
               <div className="form-row">
-                <div className="form-group">
+                <div className="form-group-modern">
                   <label className="form-label">고객사명 *</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control-modern"
                     value={siteForm.name}
                     onChange={(e) => setSiteForm({ ...siteForm, name: e.target.value })}
                   />
                 </div>
-                <div className="form-group">
+                <div className="form-group-modern">
                   <label className="form-label">계약형태</label>
                   <select
-                    className="form-control"
+                    className="form-control-modern"
                     value={siteForm.contract_type}
                     onChange={(e) => setSiteForm({ ...siteForm, contract_type: e.target.value })}
                   >
@@ -395,31 +476,31 @@ const SiteManagement = () => {
                 </div>
               </div>
 
-              <div className="form-group">
+              <div className="form-group-modern">
                 <label className="form-label">주소</label>
                 <input
                   type="text"
-                  className="form-control"
+                  className="form-control-modern"
                   value={siteForm.address}
                   onChange={(e) => setSiteForm({ ...siteForm, address: e.target.value })}
                 />
               </div>
 
               <div className="form-row">
-                <div className="form-group">
+                <div className="form-group-modern">
                   <label className="form-label">담당자</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control-modern"
                     value={siteForm.contact_person}
                     onChange={(e) => setSiteForm({ ...siteForm, contact_person: e.target.value })}
                   />
                 </div>
-                <div className="form-group">
+                <div className="form-group-modern">
                   <label className="form-label">연락처</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control-modern"
                     value={siteForm.contact_phone}
                     onChange={(e) => setSiteForm({ ...siteForm, contact_phone: e.target.value })}
                   />
@@ -427,20 +508,20 @@ const SiteManagement = () => {
               </div>
 
               <div className="form-row">
-                <div className="form-group">
+                <div className="form-group-modern">
                   <label className="form-label">계약 시작일</label>
                   <input
                     type="date"
-                    className="form-control"
+                    className="form-control-modern"
                     value={siteForm.contract_start}
                     onChange={(e) => setSiteForm({ ...siteForm, contract_start: e.target.value })}
                   />
                 </div>
-                <div className="form-group">
+                <div className="form-group-modern">
                   <label className="form-label">계약 종료일</label>
                   <input
                     type="date"
-                    className="form-control"
+                    className="form-control-modern"
                     value={siteForm.contract_end}
                     onChange={(e) => setSiteForm({ ...siteForm, contract_end: e.target.value })}
                   />
@@ -448,20 +529,20 @@ const SiteManagement = () => {
               </div>
 
               <div className="form-row">
-                <div className="form-group">
+                <div className="form-group-modern">
                   <label className="form-label">계약금액</label>
                   <input
                     type="number"
-                    className="form-control"
+                    className="form-control-modern"
                     value={siteForm.contract_amount}
                     onChange={(e) => setSiteForm({ ...siteForm, contract_amount: e.target.value })}
                     placeholder="원"
                   />
                 </div>
-                <div className="form-group">
+                <div className="form-group-modern">
                   <label className="form-label">상태</label>
                   <select
-                    className="form-control"
+                    className="form-control-modern"
                     value={siteForm.status}
                     onChange={(e) => setSiteForm({ ...siteForm, status: e.target.value })}
                   >
@@ -474,10 +555,10 @@ const SiteManagement = () => {
             </div>
 
             <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={() => setIsModalOpen(false)}>
+              <button className="btn btn-secondary btn-hover-lift" onClick={() => setIsModalOpen(false)}>
                 취소
               </button>
-              <button className="btn btn-primary" onClick={saveSite}>
+              <button className="btn btn-primary btn-hover-lift" onClick={saveSite}>
                 {editingSite ? '수정' : '등록'}
               </button>
             </div>
@@ -488,7 +569,7 @@ const SiteManagement = () => {
       {/* 인원 배정 모달 */}
       {isAssignModalOpen && (
         <div className="modal-overlay" onClick={() => setIsAssignModalOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-modern" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3 className="modal-title">
                 <Calendar size={20} style={{ marginRight: '8px' }} />
@@ -500,10 +581,10 @@ const SiteManagement = () => {
             </div>
 
             <div className="modal-body">
-              <div className="form-group">
+              <div className="form-group-modern">
                 <label className="form-label">파견 인력 *</label>
                 <select
-                  className="form-control"
+                  className="form-control-modern"
                   value={newAssignment.employee_id}
                   onChange={(e) => setNewAssignment({ ...newAssignment, employee_id: e.target.value })}
                 >
@@ -515,36 +596,36 @@ const SiteManagement = () => {
                   ))}
                 </select>
                 {employees.length === 0 && (
-                  <small style={{ color: '#dc3545' }}>대기 상태의 인력이 없습니다</small>
+                  <small style={{ color: 'var(--danger)', marginTop: 4, display: 'block' }}>대기 상태의 인력이 없습니다</small>
                 )}
               </div>
 
               <div className="form-row">
-                <div className="form-group">
+                <div className="form-group-modern">
                   <label className="form-label">파견 시작일</label>
                   <input
                     type="date"
-                    className="form-control"
+                    className="form-control-modern"
                     value={newAssignment.start_date}
                     onChange={(e) => setNewAssignment({ ...newAssignment, start_date: e.target.value })}
                   />
                 </div>
-                <div className="form-group">
+                <div className="form-group-modern">
                   <label className="form-label">파견 종료일</label>
                   <input
                     type="date"
-                    className="form-control"
+                    className="form-control-modern"
                     value={newAssignment.end_date}
                     onChange={(e) => setNewAssignment({ ...newAssignment, end_date: e.target.value })}
                   />
                 </div>
               </div>
 
-              <div className="form-group">
+              <div className="form-group-modern">
                 <label className="form-label">월 단가</label>
                 <input
                   type="number"
-                  className="form-control"
+                  className="form-control-modern"
                   value={newAssignment.monthly_rate}
                   onChange={(e) => setNewAssignment({ ...newAssignment, monthly_rate: e.target.value })}
                   placeholder="원"
@@ -553,11 +634,11 @@ const SiteManagement = () => {
             </div>
 
             <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={() => setIsAssignModalOpen(false)}>
+              <button className="btn btn-secondary btn-hover-lift" onClick={() => setIsAssignModalOpen(false)}>
                 취소
               </button>
               <button
-                className="btn btn-primary"
+                className="btn btn-primary btn-hover-lift"
                 onClick={createAssignment}
                 disabled={!newAssignment.employee_id}
               >

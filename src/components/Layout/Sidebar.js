@@ -14,8 +14,8 @@ const Sidebar = ({ user, onLogout }) => {
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-        <img src="/logo.png" alt="KCS Logo" className="sidebar-logo" />
-        <div className="sidebar-title">IT 인력관리 시스템</div>
+        <img src="/kcs-logo2.png" alt="KCS Logo" className="sidebar-logo" />
+        <div className="sidebar-title">IT인사시스템</div>
       </div>
 
       <nav className="sidebar-nav">

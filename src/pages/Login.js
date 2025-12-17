@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LogIn } from 'lucide-react';
+import '../Login.css';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:4000';
 
@@ -36,52 +36,66 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-box">
-        <div className="login-header">
-          <img src="/logo.png" alt="KCS" className="login-logo" />
-          <h1 className="login-title">IT 인력관리 시스템</h1>
-          <p className="login-subtitle">KCS Information Technology</p>
-        </div>
+    <div className="login-page">
+      {/* 좌측 - 대형 타이포그래피 */}
+      <div className="login-hero">
+        <h1 className="hero-title">
+          <span>HUMAN</span>
+          <span className="accent">RESOURCE</span>
+          <span>AI</span>
+        </h1>
+        <p className="hero-subtitle">Intelligence Management System</p>
+        <div className="deco-number">25</div>
+      </div>
 
-        <form onSubmit={handleSubmit} className="login-form">
-          {error && (
-            <div className="login-error">
-              {error}
+      {/* 우측 - 로그인 폼 */}
+      <div className="login-form-section">
+        <img src="/logo.png" alt="KCS" className="form-logo" />
+        
+        <div className="login-form-wrapper">
+          <div className="form-header">
+            <h2 className="form-title">Sign In</h2>
+            <p className="form-description">Enter your credentials to access the system</p>
+          </div>
+
+          <form onSubmit={handleSubmit}>
+            {error && (
+              <div className="login-error">{error}</div>
+            )}
+
+            <div className="input-group">
+              <label className="input-label">Username</label>
+              <input
+                type="text"
+                className="login-input"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter your ID"
+                autoFocus
+              />
+              <div className="input-line"></div>
             </div>
-          )}
 
-          <div className="form-group">
-            <label className="form-label">아이디</label>
-            <input
-              type="text"
-              className="form-control"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="아이디를 입력하세요"
-              autoFocus
-            />
+            <div className="input-group">
+              <label className="input-label">Password</label>
+              <input
+                type="password"
+                className="login-input"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+              />
+              <div className="input-line"></div>
+            </div>
+
+            <button type="submit" className="login-button" disabled={loading}>
+              <span>{loading ? 'Signing in...' : 'Continue'}</span>
+            </button>
+          </form>
+
+          <div className="login-footer">
+            <p>© 2025 KCS Corporation. All rights reserved.</p>
           </div>
-
-          <div className="form-group">
-            <label className="form-label">비밀번호</label>
-            <input
-              type="password"
-              className="form-control"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="비밀번호를 입력하세요"
-            />
-          </div>
-
-          <button type="submit" className="btn btn-primary login-btn" disabled={loading}>
-            <LogIn size={18} />
-            {loading ? '로그인 중...' : '로그인'}
-          </button>
-        </form>
-
-        <div className="login-footer">
-          <p>Copyright 2025. KCS All rights reserved.</p>
         </div>
       </div>
     </div>

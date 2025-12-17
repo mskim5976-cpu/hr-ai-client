@@ -1,86 +1,413 @@
-/* 전체 배경 */
+/* Google Fonts - Editorial Pairing */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap');
+
+/* CSS Variables - Blue, White, Black Harmony */
+:root {
+  --bg-primary: #F8FAFC;
+  --bg-secondary: #FFFFFF;
+  --bg-dark: #0B1426;
+  --text-primary: #0B1426;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --text-light: #F1F5F9;
+  --accent: #2563EB;
+  --accent-light: #3B82F6;
+  --accent-dark: #1D4ED8;
+  --accent-subtle: #DBEAFE;
+  --border: #E2E8F0;
+  --border-dark: #1E3A5F;
+}
+
+/* Reset & Base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 전체 페이지 */
 .login-page {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
-  align-items: center;
+  background: var(--bg-primary);
+  font-family: 'DM Sans', sans-serif;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 좌측 - 대형 타이포그래피 영역 (다크) */
+.login-hero {
+  flex: 1.2;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
-  background: linear-gradient(135deg, #163b6b, #1f5a9c);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  padding: 80px;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-dark);
 }
 
-/* 카드 */
-.login-card {
-  width: 360px;
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 32px 28px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
-  text-align: center;
+/* 배경 장식 요소 */
+.login-hero::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -20%;
+  width: 80%;
+  height: 140%;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+  transform: skewX(-8deg);
+  z-index: 0;
+  opacity: 0.15;
 }
 
-/* 로고 */
-.login-logo {
-  width: 260px;
+.login-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.3;
+}
+
+/* 대형 텍스트 */
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(80px, 15vw, 180px);
+  line-height: 0.9;
+  color: var(--text-light);
+  letter-spacing: -0.02em;
+  position: relative;
+  z-index: 1;
+  animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+  transform: translateY(60px);
+}
+
+.hero-title span {
+  display: block;
+}
+
+.hero-title .accent {
+  color: var(--accent-light);
+  position: relative;
+}
+
+.hero-title .accent::after {
+  content: '';
+  position: absolute;
+  bottom: 0.05em;
+  left: 0;
+  width: 100%;
+  height: 0.06em;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: lineReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+}
+
+/* 서브텍스트 */
+.hero-subtitle {
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--text-muted);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  margin-top: 40px;
+  position: relative;
+  z-index: 1;
+  animation: fadeIn 0.6s ease 0.4s forwards;
+  opacity: 0;
+}
+
+/* 우측 - 로그인 폼 영역 (라이트) */
+.login-form-section {
+  flex: 0.8;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 60px;
+  background: var(--bg-secondary);
+  position: relative;
+}
+
+/* 상단 로고 */
+.form-logo {
+  position: absolute;
+  top: 40px;
+  right: 60px;
+  width: 200px;
+  animation: fadeIn 0.6s ease 0.2s forwards;
+  opacity: 0;
+}
+
+/* 폼 래퍼 */
+.login-form-wrapper {
+  max-width: 360px;
+  animation: slideLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+  opacity: 0;
+  transform: translateX(40px);
+}
+
+/* 폼 헤더 */
+.form-header {
+  margin-bottom: 48px;
+}
+
+.form-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 48px;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+  margin-bottom: 8px;
+}
+
+.form-description {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 300;
+}
+
+/* 인풋 그룹 */
+.input-group {
   margin-bottom: 24px;
+  position: relative;
 }
 
-/* 제목 & 부제 */
-.login-title {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 4px;
-  color: #163b6b;
+.input-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 8px;
 }
 
-.login-subtitle {
-  font-size: 12px;
-  color: #777;
-  margin-bottom: 24px;
-}
-
-/* 인풋 공통 */
 .login-input {
   width: 100%;
-  padding: 10px 12px;
-  margin-bottom: 12px;
-  border-radius: 8px;
-  border: 1px solid #d0d5dd;
-  font-size: 14px;
+  padding: 16px 0;
+  font-size: 16px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
   outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.login-input::placeholder {
+  color: var(--text-muted);
+  font-weight: 300;
 }
 
 .login-input:focus {
-  border-color: #1f5a9c;
-  box-shadow: 0 0 0 1px rgba(31, 90, 156, 0.2);
+  border-bottom-color: var(--accent);
+}
+
+/* 인풋 포커스 라인 */
+.input-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--accent);
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.login-input:focus ~ .input-line {
+  width: 100%;
 }
 
 /* 버튼 */
 .login-button {
   width: 100%;
-  padding: 10px 12px;
-  margin-top: 4px;
-  border-radius: 8px;
-  border: none;
-  background: #1f5a9c;
-  color: #fff;
-  font-weight: 600;
+  padding: 18px 32px;
+  margin-top: 16px;
+  font-family: 'DM Sans', sans-serif;
   font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  background: var(--accent);
+  border: none;
   cursor: pointer;
-  transition: background 0.2s, transform 0.05s;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
+}
+
+.login-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-dark);
+  transform: translateX(-101%);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.login-button span {
+  position: relative;
+  z-index: 1;
 }
 
 .login-button:hover {
-  background: #163b6b;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px rgba(37, 99, 235, 0.3);
+}
+
+.login-button:hover::before {
+  transform: translateX(0);
 }
 
 .login-button:active {
-  transform: translateY(1px);
+  transform: translateY(0);
 }
 
-/* 하단 텍스트 */
+.login-button:disabled {
+  background: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.login-button:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* 에러 메시지 */
+.login-error {
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  font-size: 13px;
+  color: #DC2626;
+  background: #FEF2F2;
+  border-left: 2px solid #DC2626;
+}
+
+/* 하단 푸터 */
 .login-footer {
-  margin-top: 16px;
-  font-size: 11px;
-  color: #999;
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
 }
 
+.login-footer p {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 300;
+}
+
+/* 장식 요소 - 숫자 */
+.deco-number {
+  position: absolute;
+  bottom: 40px;
+  left: 80px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 200px;
+  color: var(--accent);
+  opacity: 0.08;
+  line-height: 1;
+  z-index: 0;
+}
+
+/* 애니메이션 */
+@keyframes slideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideLeft {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes lineReveal {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* 반응형 */
+@media (max-width: 1024px) {
+  .login-page {
+    flex-direction: column;
+  }
+
+  .login-hero {
+    flex: none;
+    padding: 60px 40px;
+    min-height: 40vh;
+  }
+
+  .hero-title {
+    font-size: clamp(60px, 20vw, 120px);
+  }
+
+  .login-form-section {
+    flex: none;
+    padding: 60px 40px;
+  }
+
+  .form-logo {
+    top: 20px;
+    right: 40px;
+    width: 160px;
+  }
+
+  .deco-number {
+    font-size: 120px;
+    bottom: 20px;
+    left: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-hero {
+    padding: 40px 24px;
+  }
+
+  .hero-title {
+    font-size: 60px;
+  }
+
+  .hero-subtitle {
+    font-size: 12px;
+    letter-spacing: 0.2em;
+  }
+
+  .login-form-section {
+    padding: 40px 24px;
+  }
+
+  .form-title {
+    font-size: 36px;
+  }
+
+  .form-logo {
+    position: static;
+    width: 120px;
+    margin-bottom: 24px;
+  }
+
+  .deco-number {
+    display: none;
+  }
+}
