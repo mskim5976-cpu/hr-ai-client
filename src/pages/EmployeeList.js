@@ -81,12 +81,18 @@ const EmployeeList = () => {
       const data = await res.json();
       setSelectedEmployee(data);
 
-      // 기존 스킬 파싱하여 selectedSkills 설정
+      // 기존 스킬 파싱하여 selectedSkills 설정 (형식: "Node.js:중급,JavaScript:고급")
       if (data.skills) {
-        const skillNames = data.skills.split(',').map(s => s.trim());
-        const empSkills = skills
-          .filter(s => skillNames.includes(s.name))
-          .map(s => ({ id: s.id, level: '중급' }));
+        const skillParts = data.skills.split(',').map(s => {
+          const [name, level] = s.trim().split(':');
+          return { name: name.trim(), level: level?.trim() || '중급' };
+        });
+        const empSkills = skillParts
+          .map(sp => {
+            const skill = skills.find(s => s.name === sp.name);
+            return skill ? { id: skill.id, level: sp.level } : null;
+          })
+          .filter(Boolean);
         setSelectedSkills(empSkills);
       } else {
         setSelectedSkills([]);
@@ -112,18 +118,47 @@ const EmployeeList = () => {
 
   const updateEmployee = async () => {
     try {
-      await fetch(`${API}/api/employees/${selectedEmployee.id}`, {
+      // 상태(status), skills(문자열), department(조인 필드), id 등 불필요한 필드 제외
+      const { status, skills: skillsStr, department, id, department_id, ...employeeData } = selectedEmployee;
+
+      // 날짜 필드를 YYYY-MM-DD 형식으로 변환
+      const formatDate = (dateStr) => {
+        if (!dateStr) return null;
+        const date = new Date(dateStr);
+        return date.toISOString().split('T')[0];
+      };
+
+      const updateData = {
+        name: employeeData.name,
+        phone: employeeData.phone,
+        email: employeeData.email,
+        age: employeeData.age,
+        address: employeeData.address,
+        applied_part: employeeData.applied_part,
+        position: employeeData.position,
+        hire_date: formatDate(employeeData.hire_date),
+        birth_date: formatDate(employeeData.birth_date),
+        status: selectedEmployee.status,  // 재직/퇴사 상태 변경 가능
+        skills: selectedSkills
+      };
+
+      const res = await fetch(`${API}/api/employees/${selectedEmployee.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...selectedEmployee,
-          skills: selectedSkills
-        }),
+        body: JSON.stringify(updateData),
       });
-      setIsModalOpen(false);
-      fetchEmployees();
+
+      if (res.ok) {
+        alert('수정이 완료되었습니다.');
+        setIsModalOpen(false);
+        fetchEmployees();
+      } else {
+        const data = await res.json();
+        alert(data.message || '수정 실패');
+      }
     } catch (error) {
       console.error('Failed to update employee:', error);
+      alert('수정 중 오류가 발생했습니다.');
     }
   };
 
@@ -155,10 +190,10 @@ const EmployeeList = () => {
     const badges = {
       '파견중': 'badge-success',
       '대기': 'badge-warning',
-      '재직': 'badge-primary',
+      '재직': 'badge-purple',
       '퇴사': 'badge-danger',
     };
-    return badges[status] || 'badge-primary';
+    return badges[status] || 'badge-purple';
   };
 
   const filterButtons = [
@@ -417,15 +452,17 @@ const EmployeeList = () => {
                   </select>
                 </div>
                 <div className="form-group-modern">
-                  <label className="form-label">상태</label>
+                  <label className="form-label">상태 <small style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>(재직/퇴사만 선택 가능)</small></label>
                   <select
                     className="form-control-modern"
                     value={selectedEmployee.status || ''}
                     onChange={(e) => setSelectedEmployee({ ...selectedEmployee, status: e.target.value })}
                     disabled={!isEditMode}
                   >
-                    <option value="대기">대기</option>
-                    <option value="파견중">파견중</option>
+                    {/* 현재 상태가 파견중/대기면 표시만 (선택 불가) */}
+                    {(selectedEmployee.status === '파견중' || selectedEmployee.status === '대기') && (
+                      <option value={selectedEmployee.status} disabled>{selectedEmployee.status} (파견관리에서 변경)</option>
+                    )}
                     <option value="재직">재직</option>
                     <option value="퇴사">퇴사</option>
                   </select>
