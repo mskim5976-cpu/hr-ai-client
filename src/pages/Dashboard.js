@@ -205,18 +205,18 @@ const Dashboard = () => {
             <div className="chart-container-modern">
               {siteDataWithColors.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={siteDataWithColors} barSize={40}>
+                  <BarChart data={siteDataWithColors} barSize={60}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.1)" vertical={false} />
                     <XAxis
                       dataKey="site_name"
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fill: '#64748B', fontSize: 12 }}
+                      tick={{ fill: '#1e293b', fontSize: 14, fontWeight: 600 }}
                     />
                     <YAxis
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fill: '#64748B', fontSize: 12 }}
+                      tick={{ fill: '#1e293b', fontSize: 14, fontWeight: 600 }}
                     />
                     <Tooltip content={<CustomTooltip />} />
                     <Bar dataKey="employee_count" name="인원 수" radius={[8, 8, 0, 0]}>

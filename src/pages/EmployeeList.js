@@ -162,11 +162,11 @@ const EmployeeList = () => {
   };
 
   const filterButtons = [
-    { label: '전체', value: '' },
-    { label: '파견중', value: '파견중' },
-    { label: '대기', value: '대기' },
-    { label: '재직', value: '재직' },
-    { label: '퇴사', value: '퇴사' },
+    { label: '전체', value: '', color: '#3B82F6' },
+    { label: '파견중', value: '파견중', color: '#22C55E' },
+    { label: '대기', value: '대기', color: '#F59E0B' },
+    { label: '재직', value: '재직', color: '#8B5CF6' },
+    { label: '퇴사', value: '퇴사', color: '#EF4444' },
   ];
 
   return (
@@ -203,6 +203,12 @@ const EmployeeList = () => {
                 key={btn.value}
                 className={`filter-btn-modern ${statusFilter === btn.value ? 'active' : ''}`}
                 onClick={() => setStatusFilter(btn.value)}
+                style={statusFilter === btn.value ? {
+                  background: btn.color,
+                  borderColor: btn.color,
+                  color: '#fff',
+                  boxShadow: `0 4px 12px ${btn.color}40`
+                } : {}}
               >
                 {btn.label}
               </button>

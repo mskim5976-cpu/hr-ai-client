@@ -3,6 +3,26 @@ import { Building2, Plus, Edit2, Trash2, X, Users, Calendar, Clock, MapPin } fro
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:4000';
 
+// 사이트 이름으로 색상 가져오기 (Dashboard와 동일)
+const getSiteColor = (siteName) => {
+  if (!siteName) return '#3B82F6';
+  const name = siteName.toUpperCase();
+  if (name.includes('삼성') || name.includes('SAMSUNG') || name.includes('SDS')) return '#3B82F6';
+  if (name.includes('LG') || name.includes('CNS')) return '#DB2777';
+  if (name.includes('SK')) return '#EF4444';
+  return '#6366F1';
+};
+
+// 계약형태별 색상
+const getContractTypeColor = (contractType) => {
+  const colors = {
+    '파견': '#3B82F6',      // 파란색
+    '도급': '#22C55E',      // 초록색
+    '프리랜서': '#F59E0B',  // 주황색
+  };
+  return colors[contractType] || '#6366F1';
+};
+
 // Skeleton 컴포넌트
 const SkeletonRow = ({ cols = 7 }) => (
   <tr>
@@ -286,7 +306,15 @@ const SiteManagement = () => {
                       </div>
                     </td>
                     <td>
-                      <span className="badge-modern badge-info">{site.contract_type || '-'}</span>
+                      <span
+                        className="badge-modern"
+                        style={{
+                          backgroundColor: getContractTypeColor(site.contract_type),
+                          color: '#fff'
+                        }}
+                      >
+                        {site.contract_type || '-'}
+                      </span>
                     </td>
                     <td>
                       <span className="badge-modern badge-with-dot badge-primary">{site.employee_count || 0}명</span>
@@ -356,7 +384,15 @@ const SiteManagement = () => {
                       <small style={{ color: 'var(--text-secondary)' }}>{assign.applied_part} / {assign.position}</small>
                     </td>
                     <td>
-                      <span className="badge-modern badge-info">{assign.site_name}</span>
+                      <span
+                        className="badge-modern"
+                        style={{
+                          backgroundColor: getSiteColor(assign.site_name),
+                          color: '#fff'
+                        }}
+                      >
+                        {assign.site_name}
+                      </span>
                     </td>
                     <td>
                       {assign.start_date?.split('T')[0]} ~<br />
