@@ -172,13 +172,13 @@ const AIReport = () => {
 
     let html = text
       // 볼드 텍스트
-      .replace(/\*\*(.*?)\*\*/g, '<strong style="color: #1e40af; font-weight: 600;">$1</strong>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong style="color: #1e40af; font-weight: 700;">$1</strong>')
 
       // H1 - 메인 제목
       .replace(/^# (.*$)/gm, `
-        <div style="text-align: center; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 2px solid #e2e8f0;">
-          <h1 style="margin: 0 0 8px 0; color: #0f172a; font-size: 26px; font-weight: 700;">$1</h1>
-          <p style="margin: 0; color: #64748b; font-size: 14px;">AI 기반 자동 생성 보고서</p>
+        <div style="text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid #e2e8f0;">
+          <h1 style="margin: 0 0 6px 0; color: #0f172a; font-size: 28px; font-weight: 800;">$1</h1>
+          <p style="margin: 0; color: #64748b; font-size: 15px; font-weight: 500;">AI 기반 자동 생성 보고서</p>
         </div>
       `)
 
@@ -189,49 +189,49 @@ const AIReport = () => {
         const color = colors[(parseInt(num) - 1) % colors.length];
         return `
           </div>
-          <div style="background: linear-gradient(135deg, ${color}08, ${color}03); border: 1px solid ${color}20; border-radius: 12px; padding: 20px; margin: 24px 0 16px 0;">
-            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-              <span style="font-size: 24px;">${icon}</span>
-              <h2 style="margin: 0; color: #0f172a; font-size: 18px; font-weight: 600;">${num}. ${title}</h2>
+          <div style="background: linear-gradient(135deg, ${color}10, ${color}05); border: 1px solid ${color}30; border-radius: 12px; padding: 18px; margin: 20px 0 14px 0;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+              <span style="font-size: 22px;">${icon}</span>
+              <h2 style="margin: 0; color: #0f172a; font-size: 20px; font-weight: 800;">${num}. ${title}</h2>
             </div>
-            <div style="color: #334155; line-height: 1.8;">
+            <div style="color: #1e293b; font-size: 16px; font-weight: 500; line-height: 1.5;">
         `;
       })
 
       // H3 - 서브 섹션
-      .replace(/^### (.*$)/gm, '<h3 style="margin: 20px 0 12px 0; color: #1e293b; font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px;"><span style="width: 4px; height: 16px; background: #3b82f6; border-radius: 2px;"></span>$1</h3>')
+      .replace(/^### (.*$)/gm, '<h3 style="margin: 16px 0 10px 0; color: #0f172a; font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px;"><span style="width: 4px; height: 16px; background: #3b82f6; border-radius: 2px;"></span>$1</h3>')
 
       // 리스트 아이템 (하이픈)
       .replace(/^- \*\*(.*?)\*\*: (.*$)/gm, `
-        <div style="display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; margin: 8px 0; background: #f8fafc; border-radius: 8px; border-left: 3px solid #3b82f6;">
-          <span style="color: #1e40af; font-weight: 600; white-space: nowrap;">$1</span>
-          <span style="color: #475569;">$2</span>
+        <div style="display: flex; align-items: flex-start; gap: 12px; padding: 10px 14px; margin: 6px 0; background: #f8fafc; border-radius: 8px; border-left: 3px solid #3b82f6;">
+          <span style="color: #1e40af; font-weight: 700; font-size: 16px; white-space: nowrap;">$1</span>
+          <span style="color: #334155; font-weight: 600; font-size: 16px;">$2</span>
         </div>
       `)
       .replace(/^- (.*$)/gm, `
-        <div style="display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; margin-left: 8px;">
-          <span style="color: #3b82f6; font-size: 8px; margin-top: 6px;">●</span>
-          <span style="color: #334155; line-height: 1.6;">$1</span>
+        <div style="display: flex; align-items: flex-start; gap: 10px; padding: 5px 0; margin-left: 8px;">
+          <span style="color: #3b82f6; font-size: 8px; margin-top: 7px;">●</span>
+          <span style="color: #1e293b; font-size: 16px; font-weight: 500; line-height: 1.4;">$1</span>
         </div>
       `)
 
       // 숫자 리스트
       .replace(/^(\d+)\. \*\*(.*?)\*\*(.*$)/gm, `
-        <div style="display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; margin: 10px 0; background: linear-gradient(135deg, #f0f9ff, #f8fafc); border-radius: 10px; border: 1px solid #e0f2fe;">
-          <span style="background: #3b82f6; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0;">$1</span>
-          <div>
-            <strong style="color: #1e40af; font-weight: 600;">$2</strong>
-            <span style="color: #475569;">$3</span>
+        <div style="display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; margin: 8px 0; background: linear-gradient(135deg, #f0f9ff, #f8fafc); border-radius: 10px; border: 1px solid #e0f2fe;">
+          <span style="background: #2563eb; color: white; min-width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; flex-shrink: 0;">$1</span>
+          <div style="line-height: 1.4;">
+            <strong style="color: #1e40af; font-weight: 700; font-size: 16px;">$2</strong>
+            <span style="color: #334155; font-weight: 600; font-size: 16px;">$3</span>
           </div>
         </div>
       `)
 
       // 줄바꿈 처리
-      .replace(/\n\n/g, '</p><p style="margin: 12px 0; line-height: 1.8; color: #334155;">')
+      .replace(/\n\n/g, '</p><p style="margin: 10px 0; line-height: 1.5; color: #1e293b; font-size: 16px; font-weight: 500;">')
       .replace(/\n/g, '<br/>');
 
     // 마지막 div 닫기
-    html = '<div>' + html + '</div></div>';
+    html = '<div style="font-size: 16px;">' + html + '</div></div>';
 
     return html;
   };
