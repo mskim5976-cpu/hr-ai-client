@@ -148,7 +148,7 @@ const EmployeeRegister = () => {
         {/* 기본 정보 */}
         <div className="bento-card card-enter stagger-1" style={{ marginBottom: 20 }}>
           <div className="bento-card-header">
-            <div className="bento-card-icon">
+            <div className="bento-card-icon primary">
               <User size={20} />
             </div>
             <h2 className="bento-card-title">기본 정보</h2>

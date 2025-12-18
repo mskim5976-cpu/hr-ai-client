@@ -303,7 +303,7 @@ const ServerStatus = () => {
       {/* 서버 목록 */}
       <div className="bento-card card-enter stagger-5">
         <div className="bento-card-header">
-          <div className="bento-card-icon">
+          <div className="bento-card-icon info">
             <HardDrive size={20} />
           </div>
           <h2 className="bento-card-title">서버 목록</h2>

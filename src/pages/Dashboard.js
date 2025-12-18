@@ -197,7 +197,7 @@ const Dashboard = () => {
         <div className="bento-lg">
           <div className="bento-card gradient-primary card-enter stagger-5">
             <div className="bento-card-header">
-              <div className="bento-card-icon">
+              <div className="bento-card-icon primary">
                 <BarChart3 size={20} />
               </div>
               <h2 className="bento-card-title">파견 사이트별 인원</h2>
@@ -241,7 +241,7 @@ const Dashboard = () => {
         <div className="bento-lg">
           <div className="bento-card gradient-success card-enter stagger-6">
             <div className="bento-card-header">
-              <div className="bento-card-icon">
+              <div className="bento-card-icon success">
                 <PieChartIcon size={20} />
               </div>
               <h2 className="bento-card-title">인원 상태 분포</h2>
@@ -284,7 +284,7 @@ const Dashboard = () => {
         <div className="bento-wide">
           <div className="bento-card gradient-info card-enter stagger-7">
             <div className="bento-card-header">
-              <div className="bento-card-icon">
+              <div className="bento-card-icon info">
                 <UserPlus size={20} />
               </div>
               <h2 className="bento-card-title">최근 등록 인력</h2>

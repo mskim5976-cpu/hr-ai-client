@@ -260,7 +260,7 @@ const SiteManagement = () => {
       {/* 파견 사이트 목록 */}
       <div className="bento-card card-enter stagger-1" style={{ marginBottom: 20 }}>
         <div className="bento-card-header">
-          <div className="bento-card-icon">
+          <div className="bento-card-icon primary">
             <Building2 size={20} />
           </div>
           <h2 className="bento-card-title">파견 사이트</h2>
@@ -423,10 +423,10 @@ const SiteManagement = () => {
       {/* 파견 기록 */}
       <div className="bento-card card-enter stagger-3">
         <div className="bento-card-header">
-          <div className="bento-card-icon" style={{ opacity: 0.6 }}>
+          <div className="bento-card-icon info">
             <Calendar size={20} />
           </div>
-          <h2 className="bento-card-title" style={{ opacity: 0.8 }}>파견 기록</h2>
+          <h2 className="bento-card-title">파견 기록</h2>
           <span className="badge-modern" style={{ marginLeft: 'auto', background: 'var(--gray-200)', color: 'var(--text-secondary)' }}>
             {assignmentHistory.length}건
           </span>

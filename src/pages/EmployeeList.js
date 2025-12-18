@@ -255,7 +255,7 @@ const EmployeeList = () => {
       {/* 직원 목록 - Bento Card 스타일 */}
       <div className="bento-card card-enter stagger-2">
         <div className="bento-card-header">
-          <div className="bento-card-icon">
+          <div className="bento-card-icon primary">
             <Users size={20} />
           </div>
           <h2 className="bento-card-title">인력 목록</h2>
