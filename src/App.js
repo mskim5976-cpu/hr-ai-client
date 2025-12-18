@@ -6,6 +6,7 @@ import EmployeeRegister from "./pages/EmployeeRegister";
 import EmployeeList from "./pages/EmployeeList";
 import SiteManagement from "./pages/SiteManagement";
 import ServerStatus from "./pages/ServerStatus";
+import AIReport from "./pages/AIReport";
 import Login from "./pages/Login";
 
 function App() {
@@ -55,6 +56,7 @@ function App() {
             <Route path="/register" element={<EmployeeRegister />} />
             <Route path="/employees" element={<EmployeeList />} />
             <Route path="/sites" element={<SiteManagement />} />
+            <Route path="/ai-report" element={<AIReport />} />
             <Route path="/servers" element={<ServerStatus />} />
           </Routes>
         </main>

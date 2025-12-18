@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, UserPlus, Users, Building2, Server, LogOut, User } from 'lucide-react';
+import { LayoutDashboard, UserPlus, Users, Building2, Server, LogOut, User, FileText } from 'lucide-react';
 
 const Sidebar = ({ user, onLogout }) => {
   const menuItems = [
@@ -8,6 +8,7 @@ const Sidebar = ({ user, onLogout }) => {
     { path: '/register', icon: UserPlus, label: '인사등록' },
     { path: '/employees', icon: Users, label: '인사현황' },
     { path: '/sites', icon: Building2, label: '파견관리' },
+    { path: '/ai-report', icon: FileText, label: 'AI보고서' },
     { path: '/servers', icon: Server, label: '시스템관리' },
   ];
 
