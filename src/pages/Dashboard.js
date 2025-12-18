@@ -344,8 +344,8 @@ const Dashboard = () => {
                     <AlertTriangle size={18} />
                     <div style={{ flex: 1 }}>
                       <strong>{contract.name}</strong>
-                      <p style={{ fontSize: '13px', marginTop: '4px', color: 'var(--text-secondary)' }}>
-                        만료일: {contract.contract_end}
+                      <p style={{ fontSize: '15px', marginTop: '4px', color: 'var(--text-secondary)' }}>
+                        만료일: {contract.contract_end?.split('T')[0]}
                       </p>
                     </div>
                     <span className={`badge-modern ${contract.days_left <= 7 ? 'badge-danger' : 'badge-warning'}`}>
