@@ -187,11 +187,11 @@ const AIReport = () => {
         // 본문 포맷팅 (본문 20px, 행간 축소)
         content = content
           // 리스트 아이템 (키:값 형태)
-          .replace(/^- \*\*(.*?)\*\*:?\s*(.*$)/gm, `<div style="display: flex; align-items: flex-start; gap: 10px; margin: 4px 0; padding-left: 62px;"><span style="color: #4338ca; font-weight: 700; font-size: 20px;">$1</span><span style="color: #334155; font-weight: 600; font-size: 20px;">$2</span></div>`)
+          .replace(/^- \*\*(.*?)\*\*:?\s*(.*$)/gm, `<div style="display: flex; align-items: flex-start; gap: 10px; margin: 4px 0;"><span style="color: #4338ca; font-weight: 700; font-size: 20px;">$1</span><span style="color: #334155; font-weight: 600; font-size: 20px;">$2</span></div>`)
           // 일반 리스트 아이템
-          .replace(/^- (.*$)/gm, `<div style="display: flex; align-items: flex-start; gap: 8px; margin: 4px 0; padding-left: 62px;"><span style="color: #667eea; font-size: 20px;">•</span><span style="color: #1e293b; font-size: 20px; font-weight: 600; line-height: 1.4;">$1</span></div>`)
+          .replace(/^- (.*$)/gm, `<div style="display: flex; align-items: flex-start; gap: 8px; margin: 4px 0;"><span style="color: #667eea; font-size: 20px;">•</span><span style="color: #1e293b; font-size: 20px; font-weight: 600; line-height: 1.4;">$1</span></div>`)
           // 숫자 리스트 (권고사항 등)
-          .replace(/^(\d+)\. \*\*(.*?)\*\*(.*$)/gm, `<div style="display: flex; align-items: flex-start; gap: 10px; margin: 6px 0; padding-left: 62px;"><span style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; min-width: 28px; height: 28px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800;">$1</span><div style="line-height: 1.3;"><strong style="color: #1e40af; font-weight: 700; font-size: 20px;">$2</strong><span style="color: #475569; font-weight: 600; font-size: 20px;">$3</span></div></div>`)
+          .replace(/^(\d+)\. \*\*(.*?)\*\*(.*$)/gm, `<div style="display: flex; align-items: flex-start; gap: 10px; margin: 6px 0;"><span style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; min-width: 28px; height: 28px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800;">$1</span><div style="line-height: 1.3;"><strong style="color: #1e40af; font-weight: 700; font-size: 20px;">$2</strong><span style="color: #475569; font-weight: 600; font-size: 20px;">$3</span></div></div>`)
           // 나머지 볼드 텍스트
           .replace(/\*\*(.*?)\*\*/g, '<strong style="color: #1e40af; font-weight: 700;">$1</strong>')
           // 줄바꿈
@@ -205,7 +205,7 @@ const AIReport = () => {
               </div>
               <h2 style="margin: 0; color: #0f172a; font-size: 28px; font-weight: 800;">${num}. ${title}</h2>
             </div>
-            <div style="color: #1e293b; font-size: 20px; font-weight: 600; line-height: 1.4; padding-left: 62px;">
+            <div style="color: #1e293b; font-size: 20px; font-weight: 600; line-height: 1.4; margin-left: 62px;">
               ${content}
             </div>
           </div>
