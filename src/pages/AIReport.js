@@ -34,13 +34,19 @@ const AIReport = () => {
   // 보고서 저장
   const saveReport = async (content) => {
     try {
-      const today = new Date().toLocaleDateString('ko-KR', {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('ko-KR', {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit'
       }).replace(/\. /g, '-').replace('.', '');
+      const timeStr = now.toLocaleTimeString('ko-KR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).replace(':', '시') + '분';
 
-      const title = `인력현황요약보고서_${today}`;
+      const title = `인력현황요약보고서_${dateStr}_${timeStr}`;
 
       await fetch(`${API}/api/ai/reports`, {
         method: 'POST',
@@ -150,18 +156,84 @@ const AIReport = () => {
     }
   };
 
-  // 마크다운 스타일 텍스트를 HTML로 간단히 변환
+  // 섹션 아이콘 매핑
+  const sectionIcons = {
+    '요약': '📊',
+    '주요 현황': '📈',
+    '주의 사항': '⚠️',
+    '권고 사항': '💡',
+    '파견 현황': '🏢',
+    '인력 현황': '👥',
+  };
+
+  // 마크다운 스타일 텍스트를 모던한 HTML로 변환
   const formatReport = (text) => {
     if (!text) return '';
-    return text
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/^### (.*$)/gm, '<h3 style="margin-top: 20px; margin-bottom: 10px; color: #1e293b; font-size: 16px;">$1</h3>')
-      .replace(/^## (.*$)/gm, '<h2 style="margin-top: 24px; margin-bottom: 12px; color: #1e293b; font-size: 18px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">$1</h2>')
-      .replace(/^# (.*$)/gm, '<h1 style="margin-top: 0; margin-bottom: 16px; color: #1e293b; font-size: 22px;">$1</h1>')
-      .replace(/^- (.*$)/gm, '<li style="margin-left: 20px; margin-bottom: 6px;">$1</li>')
-      .replace(/^\d+\. (.*$)/gm, '<li style="margin-left: 20px; margin-bottom: 6px; list-style-type: decimal;">$1</li>')
-      .replace(/\n\n/g, '</p><p style="margin-bottom: 12px; line-height: 1.7;">')
+
+    let html = text
+      // 볼드 텍스트
+      .replace(/\*\*(.*?)\*\*/g, '<strong style="color: #1e40af; font-weight: 600;">$1</strong>')
+
+      // H1 - 메인 제목
+      .replace(/^# (.*$)/gm, `
+        <div style="text-align: center; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 2px solid #e2e8f0;">
+          <h1 style="margin: 0 0 8px 0; color: #0f172a; font-size: 26px; font-weight: 700;">$1</h1>
+          <p style="margin: 0; color: #64748b; font-size: 14px;">AI 기반 자동 생성 보고서</p>
+        </div>
+      `)
+
+      // H2 - 섹션 제목 (카드 스타일)
+      .replace(/^## (\d+)\. (.*$)/gm, (match, num, title) => {
+        const icon = Object.entries(sectionIcons).find(([key]) => title.includes(key))?.[1] || '📋';
+        const colors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'];
+        const color = colors[(parseInt(num) - 1) % colors.length];
+        return `
+          </div>
+          <div style="background: linear-gradient(135deg, ${color}08, ${color}03); border: 1px solid ${color}20; border-radius: 12px; padding: 20px; margin: 24px 0 16px 0;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+              <span style="font-size: 24px;">${icon}</span>
+              <h2 style="margin: 0; color: #0f172a; font-size: 18px; font-weight: 600;">${num}. ${title}</h2>
+            </div>
+            <div style="color: #334155; line-height: 1.8;">
+        `;
+      })
+
+      // H3 - 서브 섹션
+      .replace(/^### (.*$)/gm, '<h3 style="margin: 20px 0 12px 0; color: #1e293b; font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 8px;"><span style="width: 4px; height: 16px; background: #3b82f6; border-radius: 2px;"></span>$1</h3>')
+
+      // 리스트 아이템 (하이픈)
+      .replace(/^- \*\*(.*?)\*\*: (.*$)/gm, `
+        <div style="display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; margin: 8px 0; background: #f8fafc; border-radius: 8px; border-left: 3px solid #3b82f6;">
+          <span style="color: #1e40af; font-weight: 600; white-space: nowrap;">$1</span>
+          <span style="color: #475569;">$2</span>
+        </div>
+      `)
+      .replace(/^- (.*$)/gm, `
+        <div style="display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; margin-left: 8px;">
+          <span style="color: #3b82f6; font-size: 8px; margin-top: 6px;">●</span>
+          <span style="color: #334155; line-height: 1.6;">$1</span>
+        </div>
+      `)
+
+      // 숫자 리스트
+      .replace(/^(\d+)\. \*\*(.*?)\*\*(.*$)/gm, `
+        <div style="display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; margin: 10px 0; background: linear-gradient(135deg, #f0f9ff, #f8fafc); border-radius: 10px; border: 1px solid #e0f2fe;">
+          <span style="background: #3b82f6; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0;">$1</span>
+          <div>
+            <strong style="color: #1e40af; font-weight: 600;">$2</strong>
+            <span style="color: #475569;">$3</span>
+          </div>
+        </div>
+      `)
+
+      // 줄바꿈 처리
+      .replace(/\n\n/g, '</p><p style="margin: 12px 0; line-height: 1.8; color: #334155;">')
       .replace(/\n/g, '<br/>');
+
+    // 마지막 div 닫기
+    html = '<div>' + html + '</div></div>';
+
+    return html;
   };
 
   return (
