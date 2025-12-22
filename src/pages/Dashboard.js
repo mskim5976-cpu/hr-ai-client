@@ -204,7 +204,7 @@ const Dashboard = () => {
             </div>
             <div className="chart-container-modern">
               {siteDataWithColors.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height={270} minHeight={200}>
                   <BarChart data={siteDataWithColors} barSize={60}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.1)" vertical={false} />
                     <XAxis
@@ -248,7 +248,7 @@ const Dashboard = () => {
             </div>
             <div className="chart-container-modern">
               {statusData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height={270} minHeight={200}>
                   <PieChart>
                     <Pie
                       data={statusData}
