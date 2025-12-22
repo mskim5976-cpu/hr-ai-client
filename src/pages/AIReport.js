@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { FileText, Download, RefreshCw, Users, Building2, AlertTriangle, Calendar, History, Eye } from 'lucide-react';
+import { FileText, Download, RefreshCw, Users, Building2, AlertTriangle, Calendar, History, Eye, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -12,20 +12,37 @@ const AIReport = () => {
   const [error, setError] = useState(null);
   const [history, setHistory] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({ total: 0, totalPages: 0 });
   const reportRef = useRef(null);
 
-  // 보고서 기록 조회
-  const fetchHistory = useCallback(async () => {
+  // 보고서 기록 조회 (페이지네이션)
+  const fetchHistory = useCallback(async (page = 1) => {
     try {
-      const res = await fetch(`${API}/api/ai/reports`);
+      const res = await fetch(`${API}/api/ai/reports?page=${page}&limit=10`);
       if (res.ok) {
         const data = await res.json();
-        setHistory(data);
+        setHistory(data.data);
+        setPagination(data.pagination);
+        setCurrentPage(page);
       }
     } catch (err) {
       console.error('Failed to fetch history:', err);
     }
   }, []);
+
+  // 보고서 삭제
+  const deleteReport = async (id) => {
+    if (!window.confirm('이 보고서를 삭제하시겠습니까?')) return;
+    try {
+      const res = await fetch(`${API}/api/ai/reports/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        fetchHistory(currentPage);
+      }
+    } catch (err) {
+      console.error('Failed to delete report:', err);
+    }
+  };
 
   useEffect(() => {
     fetchHistory();
@@ -397,72 +414,158 @@ const AIReport = () => {
           </div>
           <h2 className="bento-card-title">보고서 생성 기록</h2>
           <span className="badge-modern badge-primary" style={{ marginLeft: 'auto' }}>
-            {history.length}건
+            총 {pagination.total}건
           </span>
         </div>
 
         <div className="table-container">
           {history.length > 0 ? (
-            <table>
-              <thead>
-                <tr>
-                  <th style={{ width: 60 }}>순번</th>
-                  <th style={{ width: 180 }}>생성일시</th>
-                  <th>보고서명</th>
-                  <th style={{ width: 180 }}>작업</th>
-                </tr>
-              </thead>
-              <tbody>
-                {history.map((item, index) => (
-                  <tr key={item.id}>
-                    <td style={{ textAlign: 'center' }}>{history.length - index}</td>
-                    <td>{new Date(item.generated_at).toLocaleString('ko-KR')}</td>
-                    <td><strong>{item.title}</strong></td>
-                    <td>
-                      <div style={{ display: 'flex', gap: 8 }}>
-                        <button
-                          onClick={() => viewReport(item.id)}
-                          className="btn btn-sm"
-                          style={{
-                            padding: '6px 12px',
-                            fontSize: 13,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 4,
-                            background: 'var(--bg-tertiary)',
-                            border: '1px solid var(--border-color)',
-                            borderRadius: 6,
-                            cursor: 'pointer',
-                          }}
-                        >
-                          <Eye size={14} />
-                          보기
-                        </button>
-                        <button
-                          onClick={() => downloadHistoryPDF(item.id, item.title)}
-                          className="btn btn-sm"
-                          style={{
-                            padding: '6px 12px',
-                            fontSize: 13,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 4,
-                            background: 'var(--primary)',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: 6,
-                            cursor: 'pointer',
-                          }}
-                        >
-                          <Download size={14} />
-                          PDF
-                        </button>
-                      </div>
-                    </td>
+            <>
+              <table>
+                <thead>
+                  <tr>
+                    <th style={{ width: 60 }}>순번</th>
+                    <th style={{ width: 180 }}>생성일시</th>
+                    <th>보고서명</th>
+                    <th style={{ width: 220 }}>작업</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {history.map((item, index) => (
+                    <tr key={item.id}>
+                      <td style={{ textAlign: 'center' }}>{pagination.total - ((currentPage - 1) * 10) - index}</td>
+                      <td>{new Date(item.generated_at).toLocaleString('ko-KR')}</td>
+                      <td><strong>{item.title}</strong></td>
+                      <td>
+                        <div style={{ display: 'flex', gap: 8, flexWrap: 'nowrap' }}>
+                          <button
+                            onClick={() => viewReport(item.id)}
+                            className="btn btn-sm"
+                            style={{
+                              padding: '6px 12px',
+                              fontSize: 13,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 4,
+                              background: 'var(--bg-tertiary)',
+                              border: '1px solid var(--border-color)',
+                              borderRadius: 6,
+                              cursor: 'pointer',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            <Eye size={14} />
+                            보기
+                          </button>
+                          <button
+                            onClick={() => downloadHistoryPDF(item.id, item.title)}
+                            className="btn btn-sm"
+                            style={{
+                              padding: '6px 12px',
+                              fontSize: 13,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 4,
+                              background: 'var(--primary)',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: 6,
+                              cursor: 'pointer',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            <Download size={14} />
+                            PDF
+                          </button>
+                          <button
+                            onClick={() => deleteReport(item.id)}
+                            className="btn btn-sm"
+                            style={{
+                              padding: '6px 12px',
+                              fontSize: 13,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 4,
+                              background: '#ef4444',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: 6,
+                              cursor: 'pointer',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            <Trash2 size={14} />
+                            삭제
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* 페이지네이션 */}
+              {pagination.totalPages > 1 && (
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: 12,
+                  marginTop: 20,
+                  padding: '16px 0',
+                }}>
+                  <button
+                    onClick={() => fetchHistory(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    style={{
+                      padding: '8px 16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      background: currentPage === 1 ? '#e5e7eb' : '#3b82f6',
+                      color: currentPage === 1 ? '#9ca3af' : '#fff',
+                      border: currentPage === 1 ? '1px solid #d1d5db' : '1px solid #2563eb',
+                      borderRadius: 8,
+                      cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                      opacity: currentPage === 1 ? 0.6 : 1,
+                      fontWeight: 600,
+                      fontSize: 14,
+                      boxShadow: currentPage === 1 ? 'none' : '0 2px 4px rgba(59, 130, 246, 0.3)',
+                    }}
+                  >
+                    <ChevronLeft size={16} />
+                    이전
+                  </button>
+
+                  <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
+                    {currentPage} / {pagination.totalPages} 페이지
+                  </span>
+
+                  <button
+                    onClick={() => fetchHistory(currentPage + 1)}
+                    disabled={currentPage === pagination.totalPages}
+                    style={{
+                      padding: '8px 16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      background: currentPage === pagination.totalPages ? '#e5e7eb' : '#3b82f6',
+                      color: currentPage === pagination.totalPages ? '#9ca3af' : '#fff',
+                      border: currentPage === pagination.totalPages ? '1px solid #d1d5db' : '1px solid #2563eb',
+                      borderRadius: 8,
+                      cursor: currentPage === pagination.totalPages ? 'not-allowed' : 'pointer',
+                      opacity: currentPage === pagination.totalPages ? 0.6 : 1,
+                      fontWeight: 600,
+                      fontSize: 14,
+                      boxShadow: currentPage === pagination.totalPages ? 'none' : '0 2px 4px rgba(59, 130, 246, 0.3)',
+                    }}
+                  >
+                    다음
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
             <div style={{
               padding: 40,
