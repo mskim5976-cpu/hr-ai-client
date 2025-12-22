@@ -901,6 +901,20 @@ table td {
   border-color: rgba(37, 99, 235, 0.3);
 }
 
+.bento-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.bento-card-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
 @media (max-width: 1200px) {
   .bento-lg, .bento-xl { grid-column: span 6; }
   .bento-md { grid-column: span 6; }

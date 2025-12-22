@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { FileText, Download, RefreshCw, Users, Building2, AlertTriangle, Calendar, History, Eye, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { FileText, Download, RefreshCw, Users, Building2, AlertTriangle, Calendar, History, Eye, Trash2, ChevronLeft, ChevronRight, Wifi, WifiOff } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -14,7 +14,30 @@ const AIReport = () => {
   const [selectedReport, setSelectedReport] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({ total: 0, totalPages: 0 });
+  const [aiServerStatus, setAiServerStatus] = useState({ status: 'checking', message: '확인 중...' });
   const reportRef = useRef(null);
+
+  // AI 서버 상태 확인
+  const checkAIServerStatus = useCallback(async () => {
+    try {
+      const res = await fetch(`${API}/api/ai/health`);
+      if (res.ok) {
+        const data = await res.json();
+        setAiServerStatus(data);
+      } else {
+        setAiServerStatus({ status: 'error', message: '상태 확인 실패' });
+      }
+    } catch (err) {
+      setAiServerStatus({ status: 'disconnected', message: 'AI 서버 연결 실패' });
+    }
+  }, []);
+
+  // AI 서버 상태 주기적 확인 (30초마다)
+  useEffect(() => {
+    checkAIServerStatus();
+    const interval = setInterval(checkAIServerStatus, 30000);
+    return () => clearInterval(interval);
+  }, [checkAIServerStatus]);
 
   // 보고서 기록 조회 (페이지네이션)
   const fetchHistory = useCallback(async (page = 1) => {
@@ -250,7 +273,54 @@ const AIReport = () => {
       </div>
 
       {/* 생성 버튼 영역 */}
-      <div className="bento-card card-enter stagger-1" style={{ marginBottom: 20 }}>
+      <div className="bento-card card-enter stagger-1" style={{ marginBottom: 20, position: 'relative' }}>
+        {/* AI 서버 연결 상태 - 오른쪽 상단 */}
+        <span
+          style={{
+            position: 'absolute',
+            top: 16,
+            right: 16,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            padding: '6px 12px',
+            borderRadius: 8,
+            fontSize: 16,
+            fontWeight: 600,
+            background: aiServerStatus.status === 'connected'
+              ? 'rgba(34, 197, 94, 0.1)'
+              : aiServerStatus.status === 'checking'
+              ? 'rgba(156, 163, 175, 0.1)'
+              : 'rgba(239, 68, 68, 0.1)',
+            border: `1px solid ${
+              aiServerStatus.status === 'connected'
+                ? 'rgba(34, 197, 94, 0.3)'
+                : aiServerStatus.status === 'checking'
+                ? 'rgba(156, 163, 175, 0.3)'
+                : 'rgba(239, 68, 68, 0.3)'
+            }`,
+            color: aiServerStatus.status === 'connected'
+              ? '#16a34a'
+              : aiServerStatus.status === 'checking'
+              ? '#6b7280'
+              : '#dc2626',
+          }}
+          title={aiServerStatus.message}
+        >
+          {aiServerStatus.status === 'connected' ? (
+            <Wifi size={18} />
+          ) : aiServerStatus.status === 'checking' ? (
+            <RefreshCw size={18} className="spin" />
+          ) : (
+            <WifiOff size={18} />
+          )}
+          {aiServerStatus.status === 'connected'
+            ? 'AI서버 연결됨'
+            : aiServerStatus.status === 'checking'
+            ? '확인중'
+            : 'AI서버 연결끊김'}
+        </span>
+
         <div className="bento-card-header">
           <div className="bento-card-icon primary">
             <FileText size={20} />
